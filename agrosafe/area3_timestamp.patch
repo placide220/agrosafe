@@ -1,0 +1,37 @@
+diff --git a/database_architecture.md b/database_architecture.md
+index 64c41a9..6e1b651 100644
+--- a/database_architecture.md
++++ b/database_architecture.md
+@@ -29,7 +29,7 @@ erDiagram
+         string location "Geographic district / farm sector"
+         string description "Detailed symptom observations"
+         string status "Reported, Under Review, Action Taken, Resolved"
+-        string reportedAt "Timestamp of report submission"
++        timestamp reportedAt "Firestore Timestamp of report submission"
+     }
+ 
+     ADVISORIES {
+@@ -38,7 +38,7 @@ erDiagram
+         string category "Weather Warning, Pesticide Safety, Crop Disease"
+         string recommendation "Actionable advisory & spray guidance"
+         string riskLevel "Low, Moderate, High, Severe"
+-        string validUntil "Expirations / validity timestamp"
++        timestamp validUntil "Firestore Timestamp — advisory validity / expiry"
+     }
+ ```
+ 
+diff --git a/lib/features/crop_incident/data/models/incident_model.dart b/lib/features/crop_incident/data/models/incident_model.dart
+index d4eeb75..fb640fb 100644
+--- a/lib/features/crop_incident/data/models/incident_model.dart
++++ b/lib/features/crop_incident/data/models/incident_model.dart
+@@ -57,7 +57,9 @@ class IncidentModel extends IncidentEntity {
+       'location': location,
+       'description': description,
+       'status': status,
+-      'reportedAt': reportedAt.toIso8601String(),
++      // Stored as a native Firestore Timestamp (matches the ERD) so it can be
++      // range-queried and sorted server-side by the composite indexes.
++      'reportedAt': Timestamp.fromDate(reportedAt),
+     };
+   }
+ }

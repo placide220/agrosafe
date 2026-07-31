@@ -1,0 +1,163 @@
+ diff --git a/lib/screens/community_forum/community_forum_page.dart b/lib/screens/community_forum/community_forum_page.dart
+index f9cd73f..1b6d657 100644
+--- a/lib/screens/community_forum/community_forum_page.dart
++++ b/lib/screens/community_forum/community_forum_page.dart
+@@ -1,5 +1,6 @@
+ import 'package:flutter/material.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
++import 'ask_an_expert_page.dart';
+ 
+ class CommunityForumPage extends StatefulWidget {
+   final UserEntity user;
+@@ -150,7 +151,13 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                     borderRadius: BorderRadius.circular(14),
+                   ),
+                 ),
+-                onPressed: () {},
++                onPressed: () {
++                  Navigator.of(context).push(
++                    MaterialPageRoute(
++                      builder: (_) => const AskAnExpertPage(),
++                    ),
++                  );
++                },
+                 icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                 label: const Text(
+                   'Ask Community',
+diff --git a/lib/screens/community_forum/women_farmers_circle_page.dart b/lib/screens/community_forum/women_farmers_circle_page.dart
+index 2a8a028..bf80ef4 100644
+--- a/lib/screens/community_forum/women_farmers_circle_page.dart
++++ b/lib/screens/community_forum/women_farmers_circle_page.dart
+@@ -192,7 +192,13 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                           borderRadius: BorderRadius.circular(12),
+                         ),
+                       ),
+-                      onPressed: () {},
++                      onPressed: () {
++                        _showFeedback(
++                          context,
++                          'You have registered for the next Women Farmers '
++                          'Circle meeting. See you at the Musanze Community Center!',
++                        );
++                      },
+                       child: const Text(
+                         'Register Now',
+                         style: TextStyle(fontWeight: FontWeight.bold),
+diff --git a/lib/screens/main_navigation/high_contrast_home_view.dart b/lib/screens/main_navigation/high_contrast_home_view.dart
+index 5b83326..a6cdadd 100644
+--- a/lib/screens/main_navigation/high_contrast_home_view.dart
++++ b/lib/screens/main_navigation/high_contrast_home_view.dart
+@@ -1,9 +1,24 @@
+ import 'package:flutter/material.dart';
+ 
++import '../../features/auth/domain/entities/user_entity.dart';
++import '../crop_incident/incident_list_page.dart';
++import '../community_forum/women_farmers_circle_page.dart';
++import '../safety_misinformation/safety_scam_page.dart';
++import '../weather_calendar/weather_calendar_page.dart';
++
+ class HighContrastHomeView extends StatelessWidget {
++  final UserEntity user;
+   final VoidCallback onExitHighContrast;
+ 
+-  const HighContrastHomeView({super.key, required this.onExitHighContrast});
++  const HighContrastHomeView({
++    super.key,
++    required this.user,
++    required this.onExitHighContrast,
++  });
++
++  void _open(BuildContext context, Widget page) {
++    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
++  }
+ 
+   @override
+   Widget build(BuildContext context) {
+@@ -82,25 +97,25 @@ class HighContrastHomeView extends StatelessWidget {
+             _buildHighContrastButton(
+               icon: Icons.calendar_today_rounded,
+               label: '1. PLANTING CALENDAR',
+-              onTap: () {},
++              onTap: () => _open(context, const WeatherCalendarPage()),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.security_rounded,
+               label: '2. SCAM ALERTS',
+-              onTap: () {},
++              onTap: () => _open(context, const SafetyScamPage()),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.bug_report_rounded,
+               label: '3. CROP INCIDENTS',
+-              onTap: () {},
++              onTap: () => _open(context, IncidentListPage(user: user)),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.groups_rounded,
+               label: '4. WOMEN CIRCLE',
+-              onTap: () {},
++              onTap: () => _open(context, const WomenFarmersCirclePage()),
+             ),
+           ],
+         ),
+diff --git a/lib/screens/main_navigation/home_hub_view.dart b/lib/screens/main_navigation/home_hub_view.dart
+index c15f9e5..cb4ec8f 100644
+--- a/lib/screens/main_navigation/home_hub_view.dart
++++ b/lib/screens/main_navigation/home_hub_view.dart
+@@ -79,6 +79,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+               Navigator.of(context).push(
+                 MaterialPageRoute(
+                   builder: (_) => HighContrastHomeView(
++                    user: widget.user,
+                     onExitHighContrast: () => Navigator.pop(context),
+                   ),
+                 ),
+diff --git a/lib/screens/settings_profile/accessibility_settings_page.dart b/lib/screens/settings_profile/accessibility_settings_page.dart
+index d60d389..4e370c7 100644
+--- a/lib/screens/settings_profile/accessibility_settings_page.dart
++++ b/lib/screens/settings_profile/accessibility_settings_page.dart
+@@ -29,10 +29,13 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+ 
+     return Scaffold(
+       appBar: AppBar(
+-        leading: IconButton(
+-          icon: const Icon(Icons.arrow_back_rounded),
+-          onPressed: () => Navigator.maybePop(context),
+-        ),
++        // Only show a back arrow when this screen was pushed (not as a tab).
++        leading: Navigator.canPop(context)
++            ? IconButton(
++                icon: const Icon(Icons.arrow_back_rounded),
++                onPressed: () => Navigator.maybePop(context),
++              )
++            : null,
+         title: Text(isRw ? 'Igenamiterere' : 'Accessibility Settings'),
+         actions: [
+           Padding(
+diff --git a/lib/screens/weather_calendar/weather_forecast_detail_page.dart b/lib/screens/weather_calendar/weather_forecast_detail_page.dart
+index 9224c89..1b6fc47 100644
+--- a/lib/screens/weather_calendar/weather_forecast_detail_page.dart
++++ b/lib/screens/weather_calendar/weather_forecast_detail_page.dart
+@@ -118,10 +118,15 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+ 
+     return Scaffold(
+       appBar: AppBar(
+-        leading: IconButton(
+-          icon: const Icon(Icons.arrow_back_rounded),
+-          onPressed: () => Navigator.maybePop(context),
+-        ),
++        // Only show a back arrow when this screen was pushed onto the stack.
++        // As a bottom-nav tab it is the root of the stack, so a back button
++        // would have nothing to pop (this is why it appeared "dead").
++        leading: Navigator.canPop(context)
++            ? IconButton(
++                icon: const Icon(Icons.arrow_back_rounded),
++                onPressed: () => Navigator.maybePop(context),
++              )
++            : null,
+         title: Text(isRw ? 'Ikirere' : 'Weather'),
+         actions: [
+           Padding(

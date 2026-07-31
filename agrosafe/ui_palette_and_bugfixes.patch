@@ -1,0 +1,838 @@
+diff --git a/lib/core/services/audio_service.dart b/lib/core/services/audio_service.dart
+index 6f0c68e..c1aec26 100644
+--- a/lib/core/services/audio_service.dart
++++ b/lib/core/services/audio_service.dart
+@@ -32,7 +32,7 @@ class AudioService {
+                     style: TextStyle(
+                       fontWeight: FontWeight.bold,
+                       fontSize: 12,
+-                      color: Color(0xFFADF4A0),
++                      color: Color(0xFF81C784),
+                     ),
+                   ),
+                   const SizedBox(height: 2),
+@@ -45,7 +45,7 @@ class AudioService {
+             ),
+           ],
+         ),
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: const Color(0xFF1E5620),
+         duration: const Duration(seconds: 4),
+         behavior: SnackBarBehavior.floating,
+         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+diff --git a/lib/core/theme/app_colors.dart b/lib/core/theme/app_colors.dart
+new file mode 100644
+index 0000000..47ab047
+--- /dev/null
++++ b/lib/core/theme/app_colors.dart
+@@ -0,0 +1,43 @@
++import 'package:flutter/material.dart';
++
++/// AgroSafe design tokens — the single source of truth for colour.
++///
++/// Screens should reference these tokens instead of hard-coding hex values,
++/// so the palette stays consistent across the whole app. These values were
++/// consolidated from the colours already used in the app (six near-identical
++/// greens collapsed to one, a single gray ramp, one amber, one red family).
++class AppColors {
++  AppColors._();
++
++  // ---- Brand: green -------------------------------------------------------
++  static const Color primary = Color(0xFF1E5620); // canonical brand green
++  static const Color primaryDark = Color(0xFF15401A); // pressed / emphasis
++  static const Color primaryLight = Color(0xFF81C784); // light green accent
++  static const Color primarySurface = Color(0xFFF3F9F3); // faint green tint bg
++
++  // ---- Secondary: amber ---------------------------------------------------
++  static const Color amber = Color(0xFFF59E0B);
++  static const Color onAmber = Color(0xFF78350F); // text/icon on amber cards
++  static const Color amberSurface = Color(0xFFFFFBEB);
++
++  // ---- Status -------------------------------------------------------------
++  static const Color error = Color(0xFFDC2626);
++  static const Color errorDark = Color(0xFF991B1B);
++  static const Color errorSurface = Color(0xFFFEE2E2);
++  static const Color success = primary;
++  static const Color warning = amber;
++
++  // ---- Neutrals: text & lines (one consistent gray ramp) ------------------
++  static const Color textPrimary = Color(0xFF111827);
++  static const Color textSecondary = Color(0xFF4B5563);
++  static const Color textTertiary = Color(0xFF6B7280);
++  static const Color textMuted = Color(0xFF9CA3AF);
++  static const Color border = Color(0xFFE5E7EB);
++  static const Color borderStrong = Color(0xFFD1D5DB);
++  static const Color surface = Colors.white;
++  static const Color background = Color(0xFFF9F9F6);
++
++  // ---- Intentional one-offs (kept distinct on purpose) --------------------
++  static const Color highContrastYellow = Color(0xFFFFFF00); // a11y mode
++  static const Color womenCircleAccent = Color(0xFF831843); // women's circle
++}
+diff --git a/lib/core/theme/app_theme.dart b/lib/core/theme/app_theme.dart
+index 1d3978c..681136d 100644
+--- a/lib/core/theme/app_theme.dart
++++ b/lib/core/theme/app_theme.dart
+@@ -1,13 +1,17 @@
+ import 'package:flutter/material.dart';
+ import 'package:google_fonts/google_fonts.dart';
+ 
++import 'app_colors.dart';
++
+ class AppTheme {
+-  static const Color primaryGreen = Color(0xFF1E5620);
++  // Sourced from the AppColors design tokens so the theme and the screens
++  // share a single palette.
++  static const Color primaryGreen = AppColors.primary;
+   static const Color accentLeaf = Color(0xFF388E3C);
+-  static const Color amberGold = Color(0xFFF59E0B);
+-  static const Color lightGreen = Color(0xFF81C784);
+-  static const Color alertRed = Color(0xFFD32F2F);
+-  static const Color scaffoldBg = Color(0xFFF9F9F6);
++  static const Color amberGold = AppColors.amber;
++  static const Color lightGreen = AppColors.primaryLight;
++  static const Color alertRed = AppColors.error;
++  static const Color scaffoldBg = AppColors.background;
+ 
+   static ThemeData get lightTheme {
+     return ThemeData(
+diff --git a/lib/screens/app_screens_navigator.dart b/lib/screens/app_screens_navigator.dart
+index 6c85de9..301ed18 100644
+--- a/lib/screens/app_screens_navigator.dart
++++ b/lib/screens/app_screens_navigator.dart
+@@ -234,7 +234,7 @@ class AppScreensNavigator extends StatelessWidget {
+     return Scaffold(
+       appBar: AppBar(
+         title: const Text('AgroSafe Master Screen Directory'),
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: const Color(0xFF1E5620),
+         foregroundColor: Colors.white,
+       ),
+       body: ListView.builder(
+@@ -253,8 +253,8 @@ class AppScreensNavigator extends StatelessWidget {
+                 vertical: 8,
+               ),
+               leading: CircleAvatar(
+-                backgroundColor: const Color(0xFF1E5631).withValues(alpha: 0.1),
+-                child: Icon(screen.icon, color: const Color(0xFF1E5631)),
++                backgroundColor: const Color(0xFF1E5620).withValues(alpha: 0.1),
++                child: Icon(screen.icon, color: const Color(0xFF1E5620)),
+               ),
+               title: Text(
+                 screen.title,
+@@ -272,7 +272,7 @@ class AppScreensNavigator extends StatelessWidget {
+                       vertical: 2,
+                     ),
+                     decoration: BoxDecoration(
+-                      color: const Color(0xFF4C9A2A).withValues(alpha: 0.15),
++                      color: const Color(0xFF1E5620).withValues(alpha: 0.15),
+                       borderRadius: BorderRadius.circular(8),
+                     ),
+                     child: Text(
+diff --git a/lib/screens/auth/login_page.dart b/lib/screens/auth/login_page.dart
+index d6820d6..b568b1d 100644
+--- a/lib/screens/auth/login_page.dart
++++ b/lib/screens/auth/login_page.dart
+@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
+                   'Password reset link sent to ${state.email}. '
+                   'Check your inbox.',
+                 ),
+-                backgroundColor: const Color(0xFF1E5631),
++                backgroundColor: const Color(0xFF1E5620),
+               ),
+             );
+           } else if (state is AuthError) {
+@@ -145,7 +145,7 @@ class _LoginPageState extends State<LoginPage> {
+                     const Icon(
+                       Icons.shield_outlined,
+                       size: 64,
+-                      color: Color(0xFF1E5631),
++                      color: Color(0xFF1E5620),
+                     ),
+                     const SizedBox(height: 16),
+                     Text(
+@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
+                       style: Theme.of(context).textTheme.headlineMedium
+                           ?.copyWith(
+                             fontWeight: FontWeight.bold,
+-                            color: const Color(0xFF1E5631),
++                            color: const Color(0xFF1E5620),
+                           ),
+                     ),
+                     const SizedBox(height: 8),
+@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
+                                   : _showForgotPasswordDialog,
+                               child: const Text(
+                                 'Forgot password?',
+-                                style: TextStyle(color: Color(0xFF1E5631)),
++                                style: TextStyle(color: Color(0xFF1E5620)),
+                               ),
+                             ),
+                           ),
+@@ -250,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
+                                   vertical: 14,
+                                 ),
+                                 side: const BorderSide(
+-                                  color: Color(0xFF1E5631),
++                                  color: Color(0xFF1E5620),
+                                 ),
+                                 shape: RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.circular(12),
+@@ -259,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
+                               child: Text(
+                                 I18nStrings.get('guest_btn', langCode),
+                                 style: const TextStyle(
+-                                  color: Color(0xFF1E5631),
++                                  color: Color(0xFF1E5620),
+                                 ),
+                               ),
+                             ),
+@@ -283,7 +283,7 @@ class _LoginPageState extends State<LoginPage> {
+                           child: Text(
+                             I18nStrings.get('register', langCode),
+                             style: const TextStyle(
+-                              color: Color(0xFF1E5631),
++                              color: Color(0xFF1E5620),
+                               fontWeight: FontWeight.bold,
+                             ),
+                           ),
+diff --git a/lib/screens/auth/register_page.dart b/lib/screens/auth/register_page.dart
+index c04d870..a4c16f8 100644
+--- a/lib/screens/auth/register_page.dart
++++ b/lib/screens/auth/register_page.dart
+@@ -81,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
+                       style: Theme.of(context).textTheme.headlineSmall
+                           ?.copyWith(
+                             fontWeight: FontWeight.bold,
+-                            color: const Color(0xFF1E5631),
++                            color: const Color(0xFF1E5620),
+                           ),
+                     ),
+                     const SizedBox(height: 8),
+diff --git a/lib/screens/auth/welcome_page.dart b/lib/screens/auth/welcome_page.dart
+index dfcaa25..9eabf75 100644
+--- a/lib/screens/auth/welcome_page.dart
++++ b/lib/screens/auth/welcome_page.dart
+@@ -8,7 +8,7 @@ class WelcomePage extends StatelessWidget {
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+-      backgroundColor: const Color(0xFF1E5631),
++      backgroundColor: const Color(0xFF1E5620),
+       body: SafeArea(
+         child: Padding(
+           padding: const EdgeInsets.all(28.0),
+@@ -68,8 +68,8 @@ class WelcomePage extends StatelessWidget {
+                   );
+                 },
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFFADF4A0),
+-                  foregroundColor: const Color(0xFF1E5631),
++                  backgroundColor: const Color(0xFF81C784),
++                  foregroundColor: const Color(0xFF1E5620),
+                   padding: const EdgeInsets.symmetric(vertical: 16),
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(16),
+diff --git a/lib/screens/community_forum/ask_an_expert_page.dart b/lib/screens/community_forum/ask_an_expert_page.dart
+index a79314a..3b335a2 100644
+--- a/lib/screens/community_forum/ask_an_expert_page.dart
++++ b/lib/screens/community_forum/ask_an_expert_page.dart
+@@ -235,7 +235,7 @@ class AskAnExpertPage extends StatelessWidget {
+                           style: const TextStyle(
+                             fontSize: 12,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFFD97706),
++                            color: Color(0xFFF59E0B),
+                           ),
+                         ),
+                         const SizedBox(width: 8),
+diff --git a/lib/screens/community_forum/community_forum_page.dart b/lib/screens/community_forum/community_forum_page.dart
+index f9cd73f..1b6d657 100644
+--- a/lib/screens/community_forum/community_forum_page.dart
++++ b/lib/screens/community_forum/community_forum_page.dart
+@@ -1,5 +1,6 @@
+ import 'package:flutter/material.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
++import 'ask_an_expert_page.dart';
+ 
+ class CommunityForumPage extends StatefulWidget {
+   final UserEntity user;
+@@ -150,7 +151,13 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                     borderRadius: BorderRadius.circular(14),
+                   ),
+                 ),
+-                onPressed: () {},
++                onPressed: () {
++                  Navigator.of(context).push(
++                    MaterialPageRoute(
++                      builder: (_) => const AskAnExpertPage(),
++                    ),
++                  );
++                },
+                 icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                 label: const Text(
+                   'Ask Community',
+diff --git a/lib/screens/community_forum/women_farmers_circle_page.dart b/lib/screens/community_forum/women_farmers_circle_page.dart
+index 2a8a028..bf80ef4 100644
+--- a/lib/screens/community_forum/women_farmers_circle_page.dart
++++ b/lib/screens/community_forum/women_farmers_circle_page.dart
+@@ -192,7 +192,13 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                           borderRadius: BorderRadius.circular(12),
+                         ),
+                       ),
+-                      onPressed: () {},
++                      onPressed: () {
++                        _showFeedback(
++                          context,
++                          'You have registered for the next Women Farmers '
++                          'Circle meeting. See you at the Musanze Community Center!',
++                        );
++                      },
+                       child: const Text(
+                         'Register Now',
+                         style: TextStyle(fontWeight: FontWeight.bold),
+diff --git a/lib/screens/crop_incident/incident_detail_page.dart b/lib/screens/crop_incident/incident_detail_page.dart
+index 1fa7b51..f6e22f7 100644
+--- a/lib/screens/crop_incident/incident_detail_page.dart
++++ b/lib/screens/crop_incident/incident_detail_page.dart
+@@ -70,7 +70,7 @@ class IncidentDetailPage extends StatelessWidget {
+               '${I18nStrings.get('crop_name', langCode)}: ${incident.cropName}',
+               style: theme.textTheme.headlineSmall?.copyWith(
+                 fontWeight: FontWeight.bold,
+-                color: const Color(0xFF1E5631),
++                color: const Color(0xFF1E5620),
+               ),
+             ),
+             const SizedBox(height: 8),
+@@ -102,20 +102,20 @@ class IncidentDetailPage extends StatelessWidget {
+             Container(
+               padding: const EdgeInsets.all(16),
+               decoration: BoxDecoration(
+-                color: const Color(0xFF1E5631).withValues(alpha: 0.08),
++                color: const Color(0xFF1E5620).withValues(alpha: 0.08),
+                 borderRadius: BorderRadius.circular(12),
+-                border: Border.all(color: const Color(0xFF1E5631)),
++                border: Border.all(color: const Color(0xFF1E5620)),
+               ),
+               child: Row(
+                 children: [
+-                  const Icon(Icons.info_outline, color: Color(0xFF1E5631)),
++                  const Icon(Icons.info_outline, color: Color(0xFF1E5620)),
+                   const SizedBox(width: 12),
+                   Expanded(
+                     child: Text(
+                       'Status: ${incident.status} • Tracked via AgroSafe Cloud',
+                       style: const TextStyle(
+                         fontWeight: FontWeight.bold,
+-                        color: Color(0xFF1E5631),
++                        color: Color(0xFF1E5620),
+                       ),
+                     ),
+                   ),
+diff --git a/lib/screens/crop_incident/incident_list_page.dart b/lib/screens/crop_incident/incident_list_page.dart
+index d235f90..01a641a 100644
+--- a/lib/screens/crop_incident/incident_list_page.dart
++++ b/lib/screens/crop_incident/incident_list_page.dart
+@@ -76,7 +76,7 @@ class _IncidentListPageState extends State<IncidentListPage> {
+                     child: ChoiceChip(
+                       label: Text(severity),
+                       selected: isSelected,
+-                      selectedColor: const Color(0xFF1E5631),
++                      selectedColor: const Color(0xFF1E5620),
+                       labelStyle: TextStyle(
+                         color: isSelected ? Colors.white : null,
+                         fontWeight: FontWeight.bold,
+@@ -193,7 +193,7 @@ class _IncidentListPageState extends State<IncidentListPage> {
+             ),
+           );
+         },
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: const Color(0xFF1E5620),
+         foregroundColor: Colors.white,
+         icon: const Icon(Icons.add_alert_rounded),
+         label: Text(I18nStrings.get('add_incident', langCode)),
+diff --git a/lib/screens/dev/palette_preview_page.dart b/lib/screens/dev/palette_preview_page.dart
+new file mode 100644
+index 0000000..b766ec6
+--- /dev/null
++++ b/lib/screens/dev/palette_preview_page.dart
+@@ -0,0 +1,74 @@
++import 'package:flutter/material.dart';
++import '../../core/theme/app_colors.dart';
++
++/// Throwaway developer screen: renders every design token as a swatch so the
++/// consolidated palette can be verified visually on a device/emulator.
++///
++/// To view it, temporarily set `home: const PalettePreviewPage()` in app.dart,
++/// or push it from any button. Not part of the shipped user flow.
++class PalettePreviewPage extends StatelessWidget {
++  const PalettePreviewPage({super.key});
++
++  @override
++  Widget build(BuildContext context) {
++    const tokens = <_Token>[
++      _Token('primary', AppColors.primary),
++      _Token('primaryDark', AppColors.primaryDark),
++      _Token('primaryLight', AppColors.primaryLight),
++      _Token('primarySurface', AppColors.primarySurface),
++      _Token('amber', AppColors.amber),
++      _Token('onAmber', AppColors.onAmber),
++      _Token('amberSurface', AppColors.amberSurface),
++      _Token('error', AppColors.error),
++      _Token('errorDark', AppColors.errorDark),
++      _Token('errorSurface', AppColors.errorSurface),
++      _Token('textPrimary', AppColors.textPrimary),
++      _Token('textSecondary', AppColors.textSecondary),
++      _Token('textTertiary', AppColors.textTertiary),
++      _Token('textMuted', AppColors.textMuted),
++      _Token('border', AppColors.border),
++      _Token('borderStrong', AppColors.borderStrong),
++      _Token('background', AppColors.background),
++      _Token('highContrastYellow', AppColors.highContrastYellow),
++      _Token('womenCircleAccent', AppColors.womenCircleAccent),
++    ];
++
++    return Scaffold(
++      appBar: AppBar(title: const Text('Palette preview')),
++      body: ListView.separated(
++        padding: const EdgeInsets.all(16),
++        itemCount: tokens.length,
++        separatorBuilder: (_, __) => const SizedBox(height: 10),
++        itemBuilder: (_, i) {
++          final t = tokens[i];
++          return Row(
++            children: [
++              Container(
++                width: 64,
++                height: 48,
++                decoration: BoxDecoration(
++                  color: t.color,
++                  borderRadius: BorderRadius.circular(10),
++                  border: Border.all(color: AppColors.border),
++                ),
++              ),
++              const SizedBox(width: 16),
++              Expanded(
++                child: Text(
++                  t.name,
++                  style: const TextStyle(fontWeight: FontWeight.w600),
++                ),
++              ),
++            ],
++          );
++        },
++      ),
++    );
++  }
++}
++
++class _Token {
++  final String name;
++  final Color color;
++  const _Token(this.name, this.color);
++}
+diff --git a/lib/screens/main_navigation/high_contrast_home_view.dart b/lib/screens/main_navigation/high_contrast_home_view.dart
+index 5b83326..a6cdadd 100644
+--- a/lib/screens/main_navigation/high_contrast_home_view.dart
++++ b/lib/screens/main_navigation/high_contrast_home_view.dart
+@@ -1,9 +1,24 @@
+ import 'package:flutter/material.dart';
+ 
++import '../../features/auth/domain/entities/user_entity.dart';
++import '../crop_incident/incident_list_page.dart';
++import '../community_forum/women_farmers_circle_page.dart';
++import '../safety_misinformation/safety_scam_page.dart';
++import '../weather_calendar/weather_calendar_page.dart';
++
+ class HighContrastHomeView extends StatelessWidget {
++  final UserEntity user;
+   final VoidCallback onExitHighContrast;
+ 
+-  const HighContrastHomeView({super.key, required this.onExitHighContrast});
++  const HighContrastHomeView({
++    super.key,
++    required this.user,
++    required this.onExitHighContrast,
++  });
++
++  void _open(BuildContext context, Widget page) {
++    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
++  }
+ 
+   @override
+   Widget build(BuildContext context) {
+@@ -82,25 +97,25 @@ class HighContrastHomeView extends StatelessWidget {
+             _buildHighContrastButton(
+               icon: Icons.calendar_today_rounded,
+               label: '1. PLANTING CALENDAR',
+-              onTap: () {},
++              onTap: () => _open(context, const WeatherCalendarPage()),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.security_rounded,
+               label: '2. SCAM ALERTS',
+-              onTap: () {},
++              onTap: () => _open(context, const SafetyScamPage()),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.bug_report_rounded,
+               label: '3. CROP INCIDENTS',
+-              onTap: () {},
++              onTap: () => _open(context, IncidentListPage(user: user)),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.groups_rounded,
+               label: '4. WOMEN CIRCLE',
+-              onTap: () {},
++              onTap: () => _open(context, const WomenFarmersCirclePage()),
+             ),
+           ],
+         ),
+diff --git a/lib/screens/main_navigation/home_hub_view.dart b/lib/screens/main_navigation/home_hub_view.dart
+index c15f9e5..cb4ec8f 100644
+--- a/lib/screens/main_navigation/home_hub_view.dart
++++ b/lib/screens/main_navigation/home_hub_view.dart
+@@ -79,6 +79,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+               Navigator.of(context).push(
+                 MaterialPageRoute(
+                   builder: (_) => HighContrastHomeView(
++                    user: widget.user,
+                     onExitHighContrast: () => Navigator.pop(context),
+                   ),
+                 ),
+diff --git a/lib/screens/onboarding/onboarding_farm_page.dart b/lib/screens/onboarding/onboarding_farm_page.dart
+index e1c8d70..f3b5749 100644
+--- a/lib/screens/onboarding/onboarding_farm_page.dart
++++ b/lib/screens/onboarding/onboarding_farm_page.dart
+@@ -100,7 +100,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                   height: 160,
+                   width: double.infinity,
+                   decoration: const BoxDecoration(
+-                    color: Color(0xFF2E7D32),
++                    color: Color(0xFF1E5620),
+                     image: DecorationImage(
+                       image: NetworkImage(
+                         'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80',
+diff --git a/lib/screens/onboarding/onboarding_language_page.dart b/lib/screens/onboarding/onboarding_language_page.dart
+index 932eac3..b2552f2 100644
+--- a/lib/screens/onboarding/onboarding_language_page.dart
++++ b/lib/screens/onboarding/onboarding_language_page.dart
+@@ -203,7 +203,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                                     Expanded(
+                                       flex: 1,
+                                       child: Container(
+-                                        color: const Color(0xFF20603D),
++                                        color: const Color(0xFF1E5620),
+                                       ),
+                                     ),
+                                   ],
+diff --git a/lib/screens/onboarding/onboarding_page.dart b/lib/screens/onboarding/onboarding_page.dart
+index 9ef6f2f..b13f0bd 100644
+--- a/lib/screens/onboarding/onboarding_page.dart
++++ b/lib/screens/onboarding/onboarding_page.dart
+@@ -58,7 +58,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             Expanded(child: Text(message)),
+           ],
+         ),
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: const Color(0xFF1E5620),
+         duration: const Duration(seconds: 3),
+       ),
+     );
+@@ -92,7 +92,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             LinearProgressIndicator(
+               value: (_currentStep + 1) / 3,
+               backgroundColor: Colors.grey.shade300,
+-              color: const Color(0xFF1E5631),
++              color: const Color(0xFF1E5620),
+               minHeight: 6,
+             ),
+             Expanded(
+@@ -116,7 +116,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+                         },
+                         style: OutlinedButton.styleFrom(
+                           padding: const EdgeInsets.symmetric(vertical: 14),
+-                          side: const BorderSide(color: Color(0xFF1E5631)),
++                          side: const BorderSide(color: Color(0xFF1E5620)),
+                         ),
+                         child: const Text('Back'),
+                       ),
+@@ -153,14 +153,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
+     return Column(
+       crossAxisAlignment: CrossAxisAlignment.stretch,
+       children: [
+-        const Icon(Icons.language_rounded, size: 56, color: Color(0xFF1E5631)),
++        const Icon(Icons.language_rounded, size: 56, color: Color(0xFF1E5620)),
+         const SizedBox(height: 16),
+         Text(
+           'Hitamo Ururimi / Select Language',
+           textAlign: TextAlign.center,
+           style: theme.textTheme.headlineSmall?.copyWith(
+             fontWeight: FontWeight.bold,
+-            color: const Color(0xFF1E5631),
++            color: const Color(0xFF1E5620),
+           ),
+         ),
+         const SizedBox(height: 8),
+@@ -176,9 +176,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
+           child: Container(
+             padding: const EdgeInsets.all(16),
+             decoration: BoxDecoration(
+-              color: const Color(0xFF4C9A2A).withValues(alpha: 0.12),
++              color: const Color(0xFF1E5620).withValues(alpha: 0.12),
+               borderRadius: BorderRadius.circular(16),
+-              border: Border.all(color: const Color(0xFF4C9A2A)),
++              border: Border.all(color: const Color(0xFF1E5620)),
+             ),
+             child: Row(
+               children: [
+@@ -186,7 +186,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+                   _isPlayingAudio
+                       ? Icons.graphic_eq_rounded
+                       : Icons.volume_up_rounded,
+-                  color: const Color(0xFF1E5631),
++                  color: const Color(0xFF1E5620),
+                   size: 32,
+                 ),
+                 const SizedBox(width: 12),
+@@ -198,7 +198,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+                         'Kanda hano wumve mu Kinyarwanda',
+                         style: TextStyle(
+                           fontWeight: FontWeight.bold,
+-                          color: Color(0xFF1E5631),
++                          color: Color(0xFF1E5620),
+                         ),
+                       ),
+                       Text(
+@@ -219,7 +219,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             borderRadius: BorderRadius.circular(16),
+             side: BorderSide(
+               color: _selectedLanguage == 'rw'
+-                  ? const Color(0xFF1E5631)
++                  ? const Color(0xFF1E5620)
+                   : Colors.transparent,
+               width: 2,
+             ),
+@@ -230,7 +230,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+               style: TextStyle(fontWeight: FontWeight.bold),
+             ),
+             trailing: _selectedLanguage == 'rw'
+-                ? const Icon(Icons.check_circle, color: Color(0xFF1E5631))
++                ? const Icon(Icons.check_circle, color: Color(0xFF1E5620))
+                 : null,
+             onTap: () {
+               setState(() {
+@@ -247,7 +247,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             borderRadius: BorderRadius.circular(16),
+             side: BorderSide(
+               color: _selectedLanguage == 'en'
+-                  ? const Color(0xFF1E5631)
++                  ? const Color(0xFF1E5620)
+                   : Colors.transparent,
+               width: 2,
+             ),
+@@ -258,7 +258,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+               style: TextStyle(fontWeight: FontWeight.bold),
+             ),
+             trailing: _selectedLanguage == 'en'
+-                ? const Icon(Icons.check_circle, color: Color(0xFF1E5631))
++                ? const Icon(Icons.check_circle, color: Color(0xFF1E5620))
+                 : null,
+             onTap: () {
+               setState(() {
+@@ -281,7 +281,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+         const Icon(
+           Icons.location_on_outlined,
+           size: 56,
+-          color: Color(0xFF1E5631),
++          color: Color(0xFF1E5620),
+         ),
+         const SizedBox(height: 16),
+         Text(
+@@ -291,7 +291,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+           textAlign: TextAlign.center,
+           style: theme.textTheme.headlineSmall?.copyWith(
+             fontWeight: FontWeight.bold,
+-            color: const Color(0xFF1E5631),
++            color: const Color(0xFF1E5620),
+           ),
+         ),
+         const SizedBox(height: 8),
+@@ -304,12 +304,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
+         Container(
+           padding: const EdgeInsets.all(16),
+           decoration: BoxDecoration(
+-            color: const Color(0xFF1E5631).withValues(alpha: 0.08),
++            color: const Color(0xFF1E5620).withValues(alpha: 0.08),
+             borderRadius: BorderRadius.circular(12),
+           ),
+           child: const Row(
+             children: [
+-              Icon(Icons.gps_fixed_rounded, color: Color(0xFF1E5631)),
++              Icon(Icons.gps_fixed_rounded, color: Color(0xFF1E5620)),
+               SizedBox(width: 12),
+               Expanded(
+                 child: Text(
+@@ -347,14 +347,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
+     return Column(
+       crossAxisAlignment: CrossAxisAlignment.stretch,
+       children: [
+-        const Icon(Icons.eco_outlined, size: 56, color: Color(0xFF1E5631)),
++        const Icon(Icons.eco_outlined, size: 56, color: Color(0xFF1E5620)),
+         const SizedBox(height: 16),
+         Text(
+           'Select Main Crops',
+           textAlign: TextAlign.center,
+           style: theme.textTheme.headlineSmall?.copyWith(
+             fontWeight: FontWeight.bold,
+-            color: const Color(0xFF1E5631),
++            color: const Color(0xFF1E5620),
+           ),
+         ),
+         const SizedBox(height: 8),
+@@ -372,7 +372,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             return FilterChip(
+               label: Text(crop),
+               selected: isSelected,
+-              selectedColor: const Color(0xFF1E5631),
++              selectedColor: const Color(0xFF1E5620),
+               checkmarkColor: Colors.white,
+               labelStyle: TextStyle(
+                 color: isSelected ? Colors.white : Colors.black87,
+diff --git a/lib/screens/settings_profile/accessibility_settings_page.dart b/lib/screens/settings_profile/accessibility_settings_page.dart
+index d60d389..4e370c7 100644
+--- a/lib/screens/settings_profile/accessibility_settings_page.dart
++++ b/lib/screens/settings_profile/accessibility_settings_page.dart
+@@ -29,10 +29,13 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+ 
+     return Scaffold(
+       appBar: AppBar(
+-        leading: IconButton(
+-          icon: const Icon(Icons.arrow_back_rounded),
+-          onPressed: () => Navigator.maybePop(context),
+-        ),
++        // Only show a back arrow when this screen was pushed (not as a tab).
++        leading: Navigator.canPop(context)
++            ? IconButton(
++                icon: const Icon(Icons.arrow_back_rounded),
++                onPressed: () => Navigator.maybePop(context),
++              )
++            : null,
+         title: Text(isRw ? 'Igenamiterere' : 'Accessibility Settings'),
+         actions: [
+           Padding(
+diff --git a/lib/screens/settings_profile/settings_profile_page.dart b/lib/screens/settings_profile/settings_profile_page.dart
+index 41b811f..e8c956e 100644
+--- a/lib/screens/settings_profile/settings_profile_page.dart
++++ b/lib/screens/settings_profile/settings_profile_page.dart
+@@ -77,14 +77,14 @@ class SettingsProfilePage extends StatelessWidget {
+                         Chip(
+                           visualDensity: VisualDensity.compact,
+                           backgroundColor: const Color(
+-                            0xFF1E5631,
++                            0xFF1E5620,
+                           ).withValues(alpha: 0.1),
+                           label: Text(
+                             '${user.role} • ${user.farmLocation}',
+                             style: const TextStyle(
+                               fontSize: 11,
+                               fontWeight: FontWeight.bold,
+-                              color: Color(0xFF1E5631),
++                              color: Color(0xFF1E5620),
+                             ),
+                           ),
+                         ),
+@@ -172,7 +172,7 @@ class SettingsProfilePage extends StatelessWidget {
+                     trailing: settings.themeMode == 'light'
+                         ? const Icon(
+                             Icons.check_circle,
+-                            color: Color(0xFF1E5631),
++                            color: Color(0xFF1E5620),
+                           )
+                         : null,
+                     onTap: () => settingsCubit.setThemeMode('light'),
+@@ -184,7 +184,7 @@ class SettingsProfilePage extends StatelessWidget {
+                     trailing: settings.themeMode == 'dark'
+                         ? const Icon(
+                             Icons.check_circle,
+-                            color: Color(0xFF1E5631),
++                            color: Color(0xFF1E5620),
+                           )
+                         : null,
+                     onTap: () => settingsCubit.setThemeMode('dark'),
+@@ -196,7 +196,7 @@ class SettingsProfilePage extends StatelessWidget {
+                     trailing: settings.themeMode == 'system'
+                         ? const Icon(
+                             Icons.check_circle,
+-                            color: Color(0xFF1E5631),
++                            color: Color(0xFF1E5620),
+                           )
+                         : null,
+                     onTap: () => settingsCubit.setThemeMode('system'),
+diff --git a/lib/screens/weather_calendar/weather_calendar_page.dart b/lib/screens/weather_calendar/weather_calendar_page.dart
+index ca861ab..41d911f 100644
+--- a/lib/screens/weather_calendar/weather_calendar_page.dart
++++ b/lib/screens/weather_calendar/weather_calendar_page.dart
+@@ -257,7 +257,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+               title: 'Ideal Planting',
+               subtitle: 'Perfect soil moisture & mild weather.',
+               bgColor: const Color(0xFFF3F9F3),
+-              borderColor: const Color(0xFFC8E6C9),
++              borderColor: const Color(0xFF81C784),
+             ),
+             const SizedBox(height: 10),
+ 
+diff --git a/lib/screens/weather_calendar/weather_forecast_detail_page.dart b/lib/screens/weather_calendar/weather_forecast_detail_page.dart
+index 9224c89..86d25d4 100644
+--- a/lib/screens/weather_calendar/weather_forecast_detail_page.dart
++++ b/lib/screens/weather_calendar/weather_forecast_detail_page.dart
+@@ -118,10 +118,15 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+ 
+     return Scaffold(
+       appBar: AppBar(
+-        leading: IconButton(
+-          icon: const Icon(Icons.arrow_back_rounded),
+-          onPressed: () => Navigator.maybePop(context),
+-        ),
++        // Only show a back arrow when this screen was pushed onto the stack.
++        // As a bottom-nav tab it is the root of the stack, so a back button
++        // would have nothing to pop (this is why it appeared "dead").
++        leading: Navigator.canPop(context)
++            ? IconButton(
++                icon: const Icon(Icons.arrow_back_rounded),
++                onPressed: () => Navigator.maybePop(context),
++              )
++            : null,
+         title: Text(isRw ? 'Ikirere' : 'Weather'),
+         actions: [
+           Padding(
+@@ -201,7 +206,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                               Container(
+                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                 decoration: BoxDecoration(
+-                                  color: const Color(0xFFDCFCE7),
++                                  color: const Color(0xFFF3F9F3),
+                                   borderRadius: BorderRadius.circular(6),
+                                 ),
+                                 child: const Text(
+@@ -209,7 +214,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                                   style: TextStyle(
+                                     fontSize: 9,
+                                     fontWeight: FontWeight.bold,
+-                                    color: Color(0xFF15803D),
++                                    color: Color(0xFF1E5620),
+                                   ),
+                                 ),
+                               ),
+@@ -555,7 +560,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+         color: isRainAlert ? const Color(0xFFFEE2E2) : Colors.white,
+         borderRadius: BorderRadius.circular(16),
+         border: Border.all(
+-          color: isRainAlert ? const Color(0xFFEF4444) : const Color(0xFFE5E7EB),
++          color: isRainAlert ? const Color(0xFFDC2626) : const Color(0xFFE5E7EB),
+           width: isRainAlert ? 1.5 : 1,
+         ),
+       ),

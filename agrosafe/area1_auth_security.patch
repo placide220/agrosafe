@@ -1,0 +1,346 @@
+diff --git a/lib/core/services/service_locator.dart b/lib/core/services/service_locator.dart
+index 7030fb3..1539a0c 100644
+--- a/lib/core/services/service_locator.dart
++++ b/lib/core/services/service_locator.dart
+@@ -9,6 +9,7 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
+ import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
+ import '../../features/auth/domain/usecases/login_usecase.dart';
+ import '../../features/auth/domain/usecases/register_usecase.dart';
++import '../../features/auth/domain/usecases/reset_password_usecase.dart';
+ import '../../features/auth/domain/usecases/sign_out_usecase.dart';
+ import '../../features/auth/presentation/bloc/auth_bloc.dart';
+ 
+@@ -61,12 +62,14 @@ Future<void> initServiceLocator({
+   sl.registerLazySingleton(() => RegisterUseCase(sl()));
+   sl.registerLazySingleton(() => SignOutUseCase(sl()));
+   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
++  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+   sl.registerFactory<AuthBloc>(
+     () => AuthBloc(
+       loginUseCase: sl(),
+       registerUseCase: sl(),
+       signOutUseCase: sl(),
+       getCurrentUserUseCase: sl(),
++      resetPasswordUseCase: sl(),
+     ),
+   );
+ 
+diff --git a/lib/features/auth/data/datasources/auth_remote_data_source.dart b/lib/features/auth/data/datasources/auth_remote_data_source.dart
+index cf1bb75..2ced7b9 100644
+--- a/lib/features/auth/data/datasources/auth_remote_data_source.dart
++++ b/lib/features/auth/data/datasources/auth_remote_data_source.dart
+@@ -15,6 +15,7 @@ abstract class AuthRemoteDataSource {
+     required String farmLocation,
+   });
+   Future<UserModel> loginAsGuest();
++  Future<void> sendPasswordReset(String email);
+   Future<void> signOut();
+   Future<UserModel?> getCurrentUser();
+ }
+@@ -128,6 +129,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+         );
+         final uid = credential.user!.uid;
+ 
++        // Security best practice: send a verification email on sign-up so the
++        // user can confirm ownership of the address before it is trusted.
++        try {
++          await credential.user!.sendEmailVerification();
++        } catch (_) {
++          // Non-fatal: registration still succeeds even if the email
++          // (e.g. offline / rate-limited) could not be dispatched right now.
++        }
++
+         final userModel = UserModel(
+           uid: uid,
+           email: email,
+@@ -199,6 +209,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+     }
+   }
+ 
++  @override
++  Future<void> sendPasswordReset(String email) async {
++    if (_isFirebaseAvailable) {
++      try {
++        await firebaseAuth!.sendPasswordResetEmail(email: email);
++      } catch (e) {
++        throw AuthException(e.toString());
++      }
++    }
++    // In mock/offline mode there is no real mailbox to hit, so we simply
++    // resolve successfully — the UI shows the same confirmation either way.
++  }
++
+   @override
+   Future<void> signOut() async {
+     if (_isFirebaseAvailable) {
+diff --git a/lib/features/auth/data/repositories/auth_repository_impl.dart b/lib/features/auth/data/repositories/auth_repository_impl.dart
+index 16baf10..1eb1e0d 100644
+--- a/lib/features/auth/data/repositories/auth_repository_impl.dart
++++ b/lib/features/auth/data/repositories/auth_repository_impl.dart
+@@ -57,6 +57,20 @@ class AuthRepositoryImpl implements AuthRepository {
+     }
+   }
+ 
++  @override
++  Future<Either<Failure, void>> sendPasswordReset({
++    required String email,
++  }) async {
++    try {
++      await remoteDataSource.sendPasswordReset(email);
++      return const Right(null);
++    } on AuthException catch (e) {
++      return Left(AuthFailure(e.message));
++    } catch (e) {
++      return Left(AuthFailure(e.toString()));
++    }
++  }
++
+   @override
+   Future<Either<Failure, void>> signOut() async {
+     try {
+diff --git a/lib/features/auth/domain/repositories/auth_repository.dart b/lib/features/auth/domain/repositories/auth_repository.dart
+index e5b20ac..71b5155 100644
+--- a/lib/features/auth/domain/repositories/auth_repository.dart
++++ b/lib/features/auth/domain/repositories/auth_repository.dart
+@@ -17,6 +17,9 @@ abstract class AuthRepository {
+ 
+   Future<Either<Failure, UserEntity>> loginAsGuest();
+ 
++  /// Sends a password-reset email to [email] via Firebase Auth.
++  Future<Either<Failure, void>> sendPasswordReset({required String email});
++
+   Future<Either<Failure, void>> signOut();
+ 
+   Future<Either<Failure, UserEntity?>> getCurrentUser();
+diff --git a/lib/features/auth/domain/usecases/reset_password_usecase.dart b/lib/features/auth/domain/usecases/reset_password_usecase.dart
+new file mode 100644
+index 0000000..c8fb95d
+--- /dev/null
++++ b/lib/features/auth/domain/usecases/reset_password_usecase.dart
+@@ -0,0 +1,26 @@
++import 'package:dartz/dartz.dart';
++import 'package:equatable/equatable.dart';
++import '../../../../core/error/failures.dart';
++import '../../../../core/usecase/usecase.dart';
++import '../repositories/auth_repository.dart';
++
++/// Sends a password-reset email to the given address via Firebase Auth.
++class ResetPasswordUseCase implements UseCase<void, ResetPasswordParams> {
++  final AuthRepository repository;
++
++  ResetPasswordUseCase(this.repository);
++
++  @override
++  Future<Either<Failure, void>> call(ResetPasswordParams params) {
++    return repository.sendPasswordReset(email: params.email);
++  }
++}
++
++class ResetPasswordParams extends Equatable {
++  final String email;
++
++  const ResetPasswordParams({required this.email});
++
++  @override
++  List<Object?> get props => [email];
++}
+diff --git a/lib/features/auth/presentation/bloc/auth_bloc.dart b/lib/features/auth/presentation/bloc/auth_bloc.dart
+index 5748111..69ea470 100644
+--- a/lib/features/auth/presentation/bloc/auth_bloc.dart
++++ b/lib/features/auth/presentation/bloc/auth_bloc.dart
+@@ -4,6 +4,7 @@ import '../../domain/entities/user_entity.dart';
+ import '../../domain/usecases/get_current_user_usecase.dart';
+ import '../../domain/usecases/login_usecase.dart';
+ import '../../domain/usecases/register_usecase.dart';
++import '../../domain/usecases/reset_password_usecase.dart';
+ import '../../domain/usecases/sign_out_usecase.dart';
+ import 'auth_event.dart';
+ import 'auth_state.dart';
+@@ -13,17 +14,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
+   final RegisterUseCase registerUseCase;
+   final SignOutUseCase signOutUseCase;
+   final GetCurrentUserUseCase getCurrentUserUseCase;
++  final ResetPasswordUseCase resetPasswordUseCase;
+ 
+   AuthBloc({
+     required this.loginUseCase,
+     required this.registerUseCase,
+     required this.signOutUseCase,
+     required this.getCurrentUserUseCase,
++    required this.resetPasswordUseCase,
+   }) : super(AuthInitial()) {
+     on<AuthCheckRequested>(_onAuthCheckRequested);
+     on<AuthLoginSubmitted>(_onLoginSubmitted);
+     on<AuthRegisterSubmitted>(_onRegisterSubmitted);
+     on<AuthGuestLoginSubmitted>(_onGuestLoginSubmitted);
++    on<AuthPasswordResetRequested>(_onPasswordResetRequested);
+     on<AuthSignOutSubmitted>(_onSignOutSubmitted);
+   }
+ 
+@@ -91,6 +95,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
+     emit(const Authenticated(guestUser));
+   }
+ 
++  Future<void> _onPasswordResetRequested(
++    AuthPasswordResetRequested event,
++    Emitter<AuthState> emit,
++  ) async {
++    emit(AuthLoading());
++    final result = await resetPasswordUseCase(
++      ResetPasswordParams(email: event.email),
++    );
++    result.fold(
++      (failure) => emit(AuthError(failure.message)),
++      (_) => emit(AuthPasswordResetSent(event.email)),
++    );
++  }
++
+   Future<void> _onSignOutSubmitted(
+     AuthSignOutSubmitted event,
+     Emitter<AuthState> emit,
+diff --git a/lib/features/auth/presentation/bloc/auth_event.dart b/lib/features/auth/presentation/bloc/auth_event.dart
+index f20184c..3feba69 100644
+--- a/lib/features/auth/presentation/bloc/auth_event.dart
++++ b/lib/features/auth/presentation/bloc/auth_event.dart
+@@ -38,4 +38,13 @@ class AuthRegisterSubmitted extends AuthEvent {
+ 
+ class AuthGuestLoginSubmitted extends AuthEvent {}
+ 
++class AuthPasswordResetRequested extends AuthEvent {
++  final String email;
++
++  const AuthPasswordResetRequested({required this.email});
++
++  @override
++  List<Object?> get props => [email];
++}
++
+ class AuthSignOutSubmitted extends AuthEvent {}
+diff --git a/lib/features/auth/presentation/bloc/auth_state.dart b/lib/features/auth/presentation/bloc/auth_state.dart
+index 501d677..3b52893 100644
+--- a/lib/features/auth/presentation/bloc/auth_state.dart
++++ b/lib/features/auth/presentation/bloc/auth_state.dart
+@@ -23,6 +23,16 @@ class Authenticated extends AuthState {
+ 
+ class Unauthenticated extends AuthState {}
+ 
++/// Emitted after a password-reset email has been dispatched successfully.
++class AuthPasswordResetSent extends AuthState {
++  final String email;
++
++  const AuthPasswordResetSent(this.email);
++
++  @override
++  List<Object?> get props => [email];
++}
++
+ class AuthError extends AuthState {
+   final String message;
+ 
+diff --git a/lib/screens/auth/login_page.dart b/lib/screens/auth/login_page.dart
+index 8e12bb9..d6820d6 100644
+--- a/lib/screens/auth/login_page.dart
++++ b/lib/screens/auth/login_page.dart
+@@ -43,6 +43,64 @@ class _LoginPageState extends State<LoginPage> {
+     context.read<AuthBloc>().add(AuthGuestLoginSubmitted());
+   }
+ 
++  /// Prompts for an email address, then asks Firebase Auth to send a
++  /// password-reset link to it.
++  Future<void> _showForgotPasswordDialog() async {
++    final resetController = TextEditingController(
++      text: _emailController.text.trim(),
++    );
++    final dialogFormKey = GlobalKey<FormState>();
++
++    await showDialog<void>(
++      context: context,
++      builder: (dialogContext) {
++        return AlertDialog(
++          title: const Text('Reset password'),
++          content: Form(
++            key: dialogFormKey,
++            child: TextFormField(
++              controller: resetController,
++              keyboardType: TextInputType.emailAddress,
++              autofocus: true,
++              decoration: const InputDecoration(
++                labelText: 'Email address',
++                prefixIcon: Icon(Icons.email_outlined),
++                helperText: 'We will email you a secure reset link.',
++              ),
++              validator: (val) {
++                if (val == null || val.trim().isEmpty) {
++                  return 'Please enter your email';
++                }
++                if (!val.contains('@')) return 'Enter a valid email format';
++                return null;
++              },
++            ),
++          ),
++          actions: [
++            TextButton(
++              onPressed: () => Navigator.of(dialogContext).pop(),
++              child: const Text('Cancel'),
++            ),
++            ElevatedButton(
++              onPressed: () {
++                if (dialogFormKey.currentState!.validate()) {
++                  context.read<AuthBloc>().add(
++                    AuthPasswordResetRequested(
++                      email: resetController.text.trim(),
++                    ),
++                  );
++                  Navigator.of(dialogContext).pop();
++                }
++              },
++              child: const Text('Send link'),
++            ),
++          ],
++        );
++      },
++    );
++    resetController.dispose();
++  }
++
+   @override
+   Widget build(BuildContext context) {
+     final langCode = context.watch<SettingsCubit>().state.settings.languageCode;
+@@ -56,6 +114,16 @@ class _LoginPageState extends State<LoginPage> {
+                 builder: (_) => OnboardingPage(user: state.user),
+               ),
+             );
++          } else if (state is AuthPasswordResetSent) {
++            ScaffoldMessenger.of(context).showSnackBar(
++              SnackBar(
++                content: Text(
++                  'Password reset link sent to ${state.email}. '
++                  'Check your inbox.',
++                ),
++                backgroundColor: const Color(0xFF1E5631),
++              ),
++            );
+           } else if (state is AuthError) {
+             ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(
+@@ -149,7 +217,19 @@ class _LoginPageState extends State<LoginPage> {
+                               return null;
+                             },
+                           ),
+-                          const SizedBox(height: 24),
++                          Align(
++                            alignment: Alignment.centerRight,
++                            child: TextButton(
++                              onPressed: state is AuthLoading
++                                  ? null
++                                  : _showForgotPasswordDialog,
++                              child: const Text(
++                                'Forgot password?',
++                                style: TextStyle(color: Color(0xFF1E5631)),
++                              ),
++                            ),
++                          ),
++                          const SizedBox(height: 12),
+                           if (state is AuthLoading)
+                             const CircularProgressIndicator()
+                           else ...[

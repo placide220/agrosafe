@@ -1,0 +1,89 @@
+diff --git a/firebase.json b/firebase.json
+index cd4b8c5..d059a4c 100644
+--- a/firebase.json
++++ b/firebase.json
+@@ -1 +1,29 @@
+-{"flutter":{"platforms":{"android":{"default":{"projectId":"agrosafe-47bb2","appId":"1:445232998608:android:cb456f49a615e3a20a16d5","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"agrosafe-47bb2","configurations":{"android":"1:445232998608:android:cb456f49a615e3a20a16d5","ios":"1:445232998608:ios:7e195d31502105fe0a16d5","macos":"1:445232998608:ios:7e195d31502105fe0a16d5","web":"1:445232998608:web:b6fa3ba38c0324750a16d5","windows":"1:445232998608:web:8b7558cafe3728420a16d5"}}}}}}
+\ No newline at end of file
++{
++  "firestore": {
++    "rules": "firestore.rules",
++    "indexes": "firestore.indexes.json"
++  },
++  "flutter": {
++    "platforms": {
++      "android": {
++        "default": {
++          "projectId": "agrosafe-47bb2",
++          "appId": "1:445232998608:android:cb456f49a615e3a20a16d5",
++          "fileOutput": "android/app/google-services.json"
++        }
++      },
++      "dart": {
++        "lib/firebase_options.dart": {
++          "projectId": "agrosafe-47bb2",
++          "configurations": {
++            "android": "1:445232998608:android:cb456f49a615e3a20a16d5",
++            "ios": "1:445232998608:ios:7e195d31502105fe0a16d5",
++            "macos": "1:445232998608:ios:7e195d31502105fe0a16d5",
++            "web": "1:445232998608:web:b6fa3ba38c0324750a16d5",
++            "windows": "1:445232998608:web:8b7558cafe3728420a16d5"
++          }
++        }
++      }
++    }
++  }
++}
+diff --git a/firestore.indexes.json b/firestore.indexes.json
+new file mode 100644
+index 0000000..00101d5
+--- /dev/null
++++ b/firestore.indexes.json
+@@ -0,0 +1,29 @@
++{
++  "indexes": [
++    {
++      "collectionGroup": "incidents",
++      "queryScope": "COLLECTION",
++      "fields": [
++        { "fieldPath": "userId", "order": "ASCENDING" },
++        { "fieldPath": "reportedAt", "order": "DESCENDING" }
++      ]
++    },
++    {
++      "collectionGroup": "incidents",
++      "queryScope": "COLLECTION",
++      "fields": [
++        { "fieldPath": "severity", "order": "ASCENDING" },
++        { "fieldPath": "reportedAt", "order": "DESCENDING" }
++      ]
++    },
++    {
++      "collectionGroup": "advisories",
++      "queryScope": "COLLECTION",
++      "fields": [
++        { "fieldPath": "category", "order": "ASCENDING" },
++        { "fieldPath": "validUntil", "order": "DESCENDING" }
++      ]
++    }
++  ],
++  "fieldOverrides": []
++}
+diff --git a/firestore.rules b/firestore.rules
+index 5f9cf6e..f912fbf 100644
+--- a/firestore.rules
++++ b/firestore.rules
+@@ -7,9 +7,11 @@ service cloud.firestore {
+       allow read, write: if request.auth != null && request.auth.uid == userId;
+     }
+     
+-    // Incident reports collection - Authenticated users can read & create their incidents
++    // Incident reports collection - a farmer may only read/write their OWN incidents.
++    // The read rule is scoped to the owner (not any authenticated user) so one
++    // farmer can never list another farmer's reports.
+     match /incidents/{incidentId} {
+-      allow read: if request.auth != null;
++      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+     }

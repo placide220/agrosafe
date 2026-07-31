@@ -1,0 +1,3619 @@
+diff --git a/lib/core/services/audio_service.dart b/lib/core/services/audio_service.dart
+index 6f0c68e..1e88275 100644
+--- a/lib/core/services/audio_service.dart
++++ b/lib/core/services/audio_service.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ 
+ class AudioService {
+   static final AudioService _instance = AudioService._internal();
+@@ -32,7 +33,7 @@ class AudioService {
+                     style: TextStyle(
+                       fontWeight: FontWeight.bold,
+                       fontSize: 12,
+-                      color: Color(0xFFADF4A0),
++                      color: AppColors.primaryLight,
+                     ),
+                   ),
+                   const SizedBox(height: 2),
+@@ -45,7 +46,7 @@ class AudioService {
+             ),
+           ],
+         ),
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: AppColors.primary,
+         duration: const Duration(seconds: 4),
+         behavior: SnackBarBehavior.floating,
+         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+diff --git a/lib/core/theme/app_colors.dart b/lib/core/theme/app_colors.dart
+new file mode 100644
+index 0000000..b430365
+--- /dev/null
++++ b/lib/core/theme/app_colors.dart
+@@ -0,0 +1,44 @@
++import 'package:flutter/material.dart';
++
++/// AgroSafe design tokens — the single source of truth for colour.
++///
++/// Screens should reference these tokens instead of hard-coding hex values,
++/// so the palette stays consistent across the whole app. These values were
++/// consolidated from the colours already used in the app (six near-identical
++/// greens collapsed to one, a single gray ramp, one amber, one red family).
++class AppColors {
++  AppColors._();
++
++  // ---- Brand: green -------------------------------------------------------
++  static const Color primary = Color(0xFF1E5620); // canonical brand green
++  static const Color primaryDark = Color(0xFF15401A); // pressed / emphasis
++  static const Color primaryLight = Color(0xFF81C784); // light green accent
++  static const Color primarySurface = Color(0xFFF3F9F3); // faint green tint bg
++
++  // ---- Secondary: amber ---------------------------------------------------
++  static const Color amber = Color(0xFFF59E0B);
++  static const Color onAmber = Color(0xFF78350F); // text/icon on amber cards
++  static const Color amberSurface = Color(0xFFFFFBEB);
++
++  // ---- Status -------------------------------------------------------------
++  static const Color error = Color(0xFFDC2626);
++  static const Color errorDark = Color(0xFF991B1B);
++  static const Color errorSurface = Color(0xFFFEE2E2);
++  static const Color success = primary;
++  static const Color warning = amber;
++
++  // ---- Neutrals: text & lines (one consistent gray ramp) ------------------
++  static const Color textPrimary = Color(0xFF111827);
++  static const Color textStrong = Color(0xFF374151);
++  static const Color textSecondary = Color(0xFF4B5563);
++  static const Color textTertiary = Color(0xFF6B7280);
++  static const Color textMuted = Color(0xFF9CA3AF);
++  static const Color border = Color(0xFFE5E7EB);
++  static const Color borderStrong = Color(0xFFD1D5DB);
++  static const Color surface = Colors.white;
++  static const Color background = Color(0xFFF9F9F6);
++
++  // ---- Intentional one-offs (kept distinct on purpose) --------------------
++  static const Color highContrastYellow = Color(0xFFFFFF00); // a11y mode
++  static const Color womenCircleAccent = Color(0xFF831843); // women's circle
++}
+diff --git a/lib/core/theme/app_theme.dart b/lib/core/theme/app_theme.dart
+index 1d3978c..f1ccfab 100644
+--- a/lib/core/theme/app_theme.dart
++++ b/lib/core/theme/app_theme.dart
+@@ -1,13 +1,17 @@
+ import 'package:flutter/material.dart';
+ import 'package:google_fonts/google_fonts.dart';
+ 
++import 'app_colors.dart';
++
+ class AppTheme {
+-  static const Color primaryGreen = Color(0xFF1E5620);
++  // Sourced from the AppColors design tokens so the theme and the screens
++  // share a single palette.
++  static const Color primaryGreen = AppColors.primary;
+   static const Color accentLeaf = Color(0xFF388E3C);
+-  static const Color amberGold = Color(0xFFF59E0B);
+-  static const Color lightGreen = Color(0xFF81C784);
+-  static const Color alertRed = Color(0xFFD32F2F);
+-  static const Color scaffoldBg = Color(0xFFF9F9F6);
++  static const Color amberGold = AppColors.amber;
++  static const Color lightGreen = AppColors.primaryLight;
++  static const Color alertRed = AppColors.error;
++  static const Color scaffoldBg = AppColors.background;
+ 
+   static ThemeData get lightTheme {
+     return ThemeData(
+@@ -39,7 +43,7 @@ class AppTheme {
+         color: Colors.white,
+         elevation: 0,
+         shape: RoundedRectangleBorder(
+-          side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.2),
++          side: const BorderSide(color: AppColors.border, width: 1.2),
+           borderRadius: BorderRadius.circular(16),
+         ),
+       ),
+@@ -63,11 +67,11 @@ class AppTheme {
+         fillColor: Colors.white,
+         border: OutlineInputBorder(
+           borderRadius: BorderRadius.circular(12),
+-          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
++          borderSide: const BorderSide(color: AppColors.borderStrong),
+         ),
+         enabledBorder: OutlineInputBorder(
+           borderRadius: BorderRadius.circular(12),
+-          borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
++          borderSide: const BorderSide(color: AppColors.borderStrong),
+         ),
+         focusedBorder: OutlineInputBorder(
+           borderRadius: BorderRadius.circular(12),
+diff --git a/lib/screens/app_screens_navigator.dart b/lib/screens/app_screens_navigator.dart
+index 6c85de9..758128c 100644
+--- a/lib/screens/app_screens_navigator.dart
++++ b/lib/screens/app_screens_navigator.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../features/auth/domain/entities/user_entity.dart';
+ import '../features/crop_incident/domain/entities/incident_entity.dart';
+ import 'auth/login_page.dart';
+@@ -234,7 +235,7 @@ class AppScreensNavigator extends StatelessWidget {
+     return Scaffold(
+       appBar: AppBar(
+         title: const Text('AgroSafe Master Screen Directory'),
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: AppColors.primary,
+         foregroundColor: Colors.white,
+       ),
+       body: ListView.builder(
+@@ -253,8 +254,8 @@ class AppScreensNavigator extends StatelessWidget {
+                 vertical: 8,
+               ),
+               leading: CircleAvatar(
+-                backgroundColor: const Color(0xFF1E5631).withValues(alpha: 0.1),
+-                child: Icon(screen.icon, color: const Color(0xFF1E5631)),
++                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
++                child: Icon(screen.icon, color: AppColors.primary),
+               ),
+               title: Text(
+                 screen.title,
+@@ -272,7 +273,7 @@ class AppScreensNavigator extends StatelessWidget {
+                       vertical: 2,
+                     ),
+                     decoration: BoxDecoration(
+-                      color: const Color(0xFF4C9A2A).withValues(alpha: 0.15),
++                      color: AppColors.primary.withValues(alpha: 0.15),
+                       borderRadius: BorderRadius.circular(8),
+                     ),
+                     child: Text(
+diff --git a/lib/screens/auth/login_page.dart b/lib/screens/auth/login_page.dart
+index d6820d6..b7d95c8 100644
+--- a/lib/screens/auth/login_page.dart
++++ b/lib/screens/auth/login_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../../core/utils/i18n_strings.dart';
+ import '../../features/auth/presentation/bloc/auth_bloc.dart';
+@@ -121,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
+                   'Password reset link sent to ${state.email}. '
+                   'Check your inbox.',
+                 ),
+-                backgroundColor: const Color(0xFF1E5631),
++                backgroundColor: AppColors.primary,
+               ),
+             );
+           } else if (state is AuthError) {
+@@ -145,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
+                     const Icon(
+                       Icons.shield_outlined,
+                       size: 64,
+-                      color: Color(0xFF1E5631),
++                      color: AppColors.primary,
+                     ),
+                     const SizedBox(height: 16),
+                     Text(
+@@ -154,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
+                       style: Theme.of(context).textTheme.headlineMedium
+                           ?.copyWith(
+                             fontWeight: FontWeight.bold,
+-                            color: const Color(0xFF1E5631),
++                            color: AppColors.primary,
+                           ),
+                     ),
+                     const SizedBox(height: 8),
+@@ -225,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
+                                   : _showForgotPasswordDialog,
+                               child: const Text(
+                                 'Forgot password?',
+-                                style: TextStyle(color: Color(0xFF1E5631)),
++                                style: TextStyle(color: AppColors.primary),
+                               ),
+                             ),
+                           ),
+@@ -250,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
+                                   vertical: 14,
+                                 ),
+                                 side: const BorderSide(
+-                                  color: Color(0xFF1E5631),
++                                  color: AppColors.primary,
+                                 ),
+                                 shape: RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.circular(12),
+@@ -259,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
+                               child: Text(
+                                 I18nStrings.get('guest_btn', langCode),
+                                 style: const TextStyle(
+-                                  color: Color(0xFF1E5631),
++                                  color: AppColors.primary,
+                                 ),
+                               ),
+                             ),
+@@ -283,7 +284,7 @@ class _LoginPageState extends State<LoginPage> {
+                           child: Text(
+                             I18nStrings.get('register', langCode),
+                             style: const TextStyle(
+-                              color: Color(0xFF1E5631),
++                              color: AppColors.primary,
+                               fontWeight: FontWeight.bold,
+                             ),
+                           ),
+diff --git a/lib/screens/auth/register_page.dart b/lib/screens/auth/register_page.dart
+index c04d870..0b6f460 100644
+--- a/lib/screens/auth/register_page.dart
++++ b/lib/screens/auth/register_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../../core/utils/i18n_strings.dart';
+ import '../../features/auth/presentation/bloc/auth_bloc.dart';
+@@ -81,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
+                       style: Theme.of(context).textTheme.headlineSmall
+                           ?.copyWith(
+                             fontWeight: FontWeight.bold,
+-                            color: const Color(0xFF1E5631),
++                            color: AppColors.primary,
+                           ),
+                     ),
+                     const SizedBox(height: 8),
+diff --git a/lib/screens/auth/splash_page.dart b/lib/screens/auth/splash_page.dart
+index 71fd166..c8af455 100644
+--- a/lib/screens/auth/splash_page.dart
++++ b/lib/screens/auth/splash_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../../../core/services/service_locator.dart';
+ import '../../../core/usecase/usecase.dart';
+ import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
+@@ -51,7 +52,7 @@ class _SplashPageState extends State<SplashPage> {
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+-      backgroundColor: const Color(0xFF1E5620),
++      backgroundColor: AppColors.primary,
+       body: SafeArea(
+         child: Padding(
+           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+@@ -74,7 +75,7 @@ class _SplashPageState extends State<SplashPage> {
+                   child: Icon(
+                     Icons.eco_rounded,
+                     size: 72,
+-                    color: Color(0xFF81C784),
++                    color: AppColors.primaryLight,
+                   ),
+                 ),
+               ),
+@@ -107,7 +108,7 @@ class _SplashPageState extends State<SplashPage> {
+                 width: 56,
+                 height: 4,
+                 decoration: BoxDecoration(
+-                  color: const Color(0xFFF59E0B),
++                  color: AppColors.amber,
+                   borderRadius: BorderRadius.circular(2),
+                 ),
+               ),
+@@ -119,7 +120,7 @@ class _SplashPageState extends State<SplashPage> {
+                 child: ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+                     backgroundColor: Colors.white,
+-                    foregroundColor: const Color(0xFF1E5620),
++                    foregroundColor: AppColors.primary,
+                     elevation: 0,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(14),
+diff --git a/lib/screens/auth/welcome_page.dart b/lib/screens/auth/welcome_page.dart
+index dfcaa25..d005946 100644
+--- a/lib/screens/auth/welcome_page.dart
++++ b/lib/screens/auth/welcome_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../onboarding/onboarding_language_page.dart';
+ import 'login_page.dart';
+ 
+@@ -8,7 +9,7 @@ class WelcomePage extends StatelessWidget {
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+-      backgroundColor: const Color(0xFF1E5631),
++      backgroundColor: AppColors.primary,
+       body: SafeArea(
+         child: Padding(
+           padding: const EdgeInsets.all(28.0),
+@@ -68,8 +69,8 @@ class WelcomePage extends StatelessWidget {
+                   );
+                 },
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFFADF4A0),
+-                  foregroundColor: const Color(0xFF1E5631),
++                  backgroundColor: AppColors.primaryLight,
++                  foregroundColor: AppColors.primary,
+                   padding: const EdgeInsets.symmetric(vertical: 16),
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(16),
+diff --git a/lib/screens/community_forum/ask_an_expert_page.dart b/lib/screens/community_forum/ask_an_expert_page.dart
+index a79314a..ea76d58 100644
+--- a/lib/screens/community_forum/ask_an_expert_page.dart
++++ b/lib/screens/community_forum/ask_an_expert_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+ 
+ class AskAnExpertPage extends StatelessWidget {
+@@ -8,7 +9,7 @@ class AskAnExpertPage extends StatelessWidget {
+     ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(
+         content: Text(message),
+-        backgroundColor: const Color(0xFF1E5620),
++        backgroundColor: AppColors.primary,
+         duration: const Duration(seconds: 3),
+         behavior: SnackBarBehavior.floating,
+       ),
+@@ -39,7 +40,7 @@ class AskAnExpertPage extends StatelessWidget {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFFF59E0B),
++                  color: AppColors.amber,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+@@ -61,7 +62,7 @@ class AskAnExpertPage extends StatelessWidget {
+               'Connect directly with certified MINAGRI agronomists and local agricultural extension officers for verified guidance.',
+               style: TextStyle(
+                 fontSize: 15,
+-                color: Color(0xFF4B5563),
++                color: AppColors.textSecondary,
+                 height: 1.4,
+               ),
+             ),
+@@ -104,7 +105,7 @@ class AskAnExpertPage extends StatelessWidget {
+             Container(
+               padding: const EdgeInsets.all(20),
+               decoration: BoxDecoration(
+-                color: const Color(0xFFF59E0B),
++                color: AppColors.amber,
+                 borderRadius: BorderRadius.circular(20),
+               ),
+               child: Column(
+@@ -114,7 +115,7 @@ class AskAnExpertPage extends StatelessWidget {
+                     children: [
+                       Icon(
+                         Icons.phone_in_talk_rounded,
+-                        color: Color(0xFF78350F),
++                        color: AppColors.onAmber,
+                         size: 28,
+                       ),
+                       SizedBox(width: 12),
+@@ -124,7 +125,7 @@ class AskAnExpertPage extends StatelessWidget {
+                           style: TextStyle(
+                             fontSize: 18,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF78350F),
++                            color: AppColors.onAmber,
+                           ),
+                         ),
+                       ),
+@@ -135,7 +136,7 @@ class AskAnExpertPage extends StatelessWidget {
+                     'Call the National Agricultural Toll-Free Hotline for immediate rapid response support in your area.',
+                     style: TextStyle(
+                       fontSize: 14,
+-                      color: Color(0xFF78350F),
++                      color: AppColors.onAmber,
+                       height: 1.35,
+                     ),
+                   ),
+@@ -145,7 +146,7 @@ class AskAnExpertPage extends StatelessWidget {
+                     height: 48,
+                     child: ElevatedButton.icon(
+                       style: ElevatedButton.styleFrom(
+-                        backgroundColor: const Color(0xFF78350F),
++                        backgroundColor: AppColors.onAmber,
+                         foregroundColor: Colors.white,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(12),
+@@ -187,7 +188,7 @@ class AskAnExpertPage extends StatelessWidget {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(20),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+@@ -196,11 +197,11 @@ class AskAnExpertPage extends StatelessWidget {
+             children: [
+               CircleAvatar(
+                 radius: 26,
+-                backgroundColor: const Color(0xFF1E5620).withOpacity(0.15),
++                backgroundColor: AppColors.primary.withOpacity(0.15),
+                 child: Text(
+                   name.split(' ').last.substring(0, 1),
+                   style: const TextStyle(
+-                    color: Color(0xFF1E5620),
++                    color: AppColors.primary,
+                     fontWeight: FontWeight.bold,
+                     fontSize: 20,
+                   ),
+@@ -216,7 +217,7 @@ class AskAnExpertPage extends StatelessWidget {
+                       style: const TextStyle(
+                         fontSize: 16,
+                         fontWeight: FontWeight.bold,
+-                        color: Color(0xFF111827),
++                        color: AppColors.textPrimary,
+                       ),
+                     ),
+                     const SizedBox(height: 2),
+@@ -224,7 +225,7 @@ class AskAnExpertPage extends StatelessWidget {
+                       title,
+                       style: const TextStyle(
+                         fontSize: 13,
+-                        color: Color(0xFF6B7280),
++                        color: AppColors.textTertiary,
+                       ),
+                     ),
+                     const SizedBox(height: 4),
+@@ -235,7 +236,7 @@ class AskAnExpertPage extends StatelessWidget {
+                           style: const TextStyle(
+                             fontSize: 12,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFFD97706),
++                            color: AppColors.amber,
+                           ),
+                         ),
+                         const SizedBox(width: 8),
+@@ -244,7 +245,7 @@ class AskAnExpertPage extends StatelessWidget {
+                           style: const TextStyle(
+                             fontSize: 12,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF1E5620),
++                            color: AppColors.primary,
+                           ),
+                         ),
+                       ],
+@@ -260,7 +261,7 @@ class AskAnExpertPage extends StatelessWidget {
+               Expanded(
+                 child: ElevatedButton.icon(
+                   style: ElevatedButton.styleFrom(
+-                    backgroundColor: const Color(0xFF1E5620),
++                    backgroundColor: AppColors.primary,
+                     foregroundColor: Colors.white,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12),
+@@ -279,8 +280,8 @@ class AskAnExpertPage extends StatelessWidget {
+               const SizedBox(width: 12),
+               OutlinedButton.icon(
+                 style: OutlinedButton.styleFrom(
+-                  foregroundColor: const Color(0xFF1E5620),
+-                  side: const BorderSide(color: Color(0xFF1E5620)),
++                  foregroundColor: AppColors.primary,
++                  side: const BorderSide(color: AppColors.primary),
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(12),
+                   ),
+diff --git a/lib/screens/community_forum/community_forum_page.dart b/lib/screens/community_forum/community_forum_page.dart
+index f9cd73f..c791a5b 100644
+--- a/lib/screens/community_forum/community_forum_page.dart
++++ b/lib/screens/community_forum/community_forum_page.dart
+@@ -1,5 +1,7 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
++import 'ask_an_expert_page.dart';
+ 
+ class CommunityForumPage extends StatefulWidget {
+   final UserEntity user;
+@@ -39,7 +41,7 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+               width: 44,
+               height: 44,
+               decoration: const BoxDecoration(
+-                color: Color(0xFF1E5620),
++                color: AppColors.primary,
+                 shape: BoxShape.circle,
+               ),
+               child: const Icon(
+@@ -70,10 +72,10 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                     child: ChoiceChip(
+                       label: Text(cat),
+                       selected: isSelected,
+-                      selectedColor: const Color(0xFF1E5620),
++                      selectedColor: AppColors.primary,
+                       backgroundColor: Colors.white,
+                       labelStyle: TextStyle(
+-                        color: isSelected ? Colors.white : const Color(0xFF374151),
++                        color: isSelected ? Colors.white : AppColors.textStrong,
+                         fontWeight: FontWeight.bold,
+                         fontSize: 13,
+                       ),
+@@ -81,8 +83,8 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                         borderRadius: BorderRadius.circular(20),
+                         side: BorderSide(
+                           color: isSelected
+-                              ? const Color(0xFF1E5620)
+-                              : const Color(0xFFE5E7EB),
++                              ? AppColors.primary
++                              : AppColors.border,
+                         ),
+                       ),
+                       onSelected: (selected) {
+@@ -144,13 +146,19 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+               height: 52,
+               child: ElevatedButton.icon(
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFFF59E0B),
++                  backgroundColor: AppColors.amber,
+                   foregroundColor: Colors.black87,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(14),
+                   ),
+                 ),
+-                onPressed: () {},
++                onPressed: () {
++                  Navigator.of(context).push(
++                    MaterialPageRoute(
++                      builder: (_) => const AskAnExpertPage(),
++                    ),
++                  );
++                },
+                 icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                 label: const Text(
+                   'Ask Community',
+@@ -182,7 +190,7 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(20),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+@@ -191,11 +199,11 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+             children: [
+               CircleAvatar(
+                 radius: 20,
+-                backgroundColor: const Color(0xFF1E5620).withOpacity(0.15),
++                backgroundColor: AppColors.primary.withOpacity(0.15),
+                 child: Text(
+                   authorName.substring(0, 1),
+                   style: const TextStyle(
+-                    color: Color(0xFF1E5620),
++                    color: AppColors.primary,
+                     fontWeight: FontWeight.bold,
+                     fontSize: 16,
+                   ),
+@@ -211,14 +219,14 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                       style: const TextStyle(
+                         fontSize: 15,
+                         fontWeight: FontWeight.bold,
+-                        color: Color(0xFF111827),
++                        color: AppColors.textPrimary,
+                       ),
+                     ),
+                     Text(
+                       '$location • $timeAgo',
+                       style: const TextStyle(
+                         fontSize: 12,
+-                        color: Color(0xFF6B7280),
++                        color: AppColors.textTertiary,
+                       ),
+                     ),
+                   ],
+@@ -232,7 +240,7 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+             style: const TextStyle(
+               fontSize: 17,
+               fontWeight: FontWeight.bold,
+-              color: Color(0xFF111827),
++              color: AppColors.textPrimary,
+             ),
+           ),
+           const SizedBox(height: 6),
+@@ -240,19 +248,19 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+             content,
+             style: const TextStyle(
+               fontSize: 14,
+-              color: Color(0xFF4B5563),
++              color: AppColors.textSecondary,
+               height: 1.4,
+             ),
+           ),
+           const SizedBox(height: 16),
+-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
++          const Divider(height: 1, color: AppColors.border),
+           const SizedBox(height: 12),
+           Row(
+             children: [
+               const Icon(
+                 Icons.chat_bubble_outline_rounded,
+                 size: 18,
+-                color: Color(0xFF6B7280),
++                color: AppColors.textTertiary,
+               ),
+               const SizedBox(width: 6),
+               Text(
+@@ -260,14 +268,14 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                 style: const TextStyle(
+                   fontSize: 13,
+                   fontWeight: FontWeight.w600,
+-                  color: Color(0xFF6B7280),
++                  color: AppColors.textTertiary,
+                 ),
+               ),
+               const SizedBox(width: 24),
+               const Icon(
+                 Icons.thumb_up_outlined,
+                 size: 18,
+-                color: Color(0xFF6B7280),
++                color: AppColors.textTertiary,
+               ),
+               const SizedBox(width: 6),
+               Text(
+@@ -275,14 +283,14 @@ class _CommunityForumPageState extends State<CommunityForumPage> {
+                 style: const TextStyle(
+                   fontSize: 13,
+                   fontWeight: FontWeight.w600,
+-                  color: Color(0xFF6B7280),
++                  color: AppColors.textTertiary,
+                 ),
+               ),
+               const Spacer(),
+               const Icon(
+                 Icons.share_outlined,
+                 size: 18,
+-                color: Color(0xFF6B7280),
++                color: AppColors.textTertiary,
+               ),
+             ],
+           ),
+diff --git a/lib/screens/community_forum/my_cooperative_page.dart b/lib/screens/community_forum/my_cooperative_page.dart
+index 0a4aceb..84480dc 100644
+--- a/lib/screens/community_forum/my_cooperative_page.dart
++++ b/lib/screens/community_forum/my_cooperative_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+ 
+ class MyCooperativePage extends StatelessWidget {
+@@ -13,14 +14,14 @@ class MyCooperativePage extends StatelessWidget {
+           title,
+           style: const TextStyle(
+             fontWeight: FontWeight.bold,
+-            color: Color(0xFF1E5620),
++            color: AppColors.primary,
+           ),
+         ),
+         content: Text(message),
+         actions: [
+           TextButton(
+             onPressed: () => Navigator.pop(ctx),
+-            child: const Text('OK', style: TextStyle(color: Color(0xFF1E5620), fontWeight: FontWeight.bold)),
++            child: const Text('OK', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+           ),
+         ],
+       ),
+@@ -51,7 +52,7 @@ class MyCooperativePage extends StatelessWidget {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+@@ -73,7 +74,7 @@ class MyCooperativePage extends StatelessWidget {
+             Container(
+               padding: const EdgeInsets.all(24),
+               decoration: BoxDecoration(
+-                color: const Color(0xFF1E5620),
++                color: AppColors.primary,
+                 borderRadius: BorderRadius.circular(24),
+               ),
+               child: Column(
+@@ -88,7 +89,7 @@ class MyCooperativePage extends StatelessWidget {
+                           vertical: 6,
+                         ),
+                         decoration: BoxDecoration(
+-                          color: const Color(0xFFF59E0B),
++                          color: AppColors.amber,
+                           borderRadius: BorderRadius.circular(12),
+                         ),
+                         child: const Text(
+@@ -201,7 +202,7 @@ class MyCooperativePage extends StatelessWidget {
+               style: TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 14),
+@@ -240,7 +241,7 @@ class MyCooperativePage extends StatelessWidget {
+         decoration: BoxDecoration(
+           color: Colors.white,
+           borderRadius: BorderRadius.circular(18),
+-          border: Border.all(color: const Color(0xFFE5E7EB)),
++          border: Border.all(color: AppColors.border),
+         ),
+         child: Column(
+           crossAxisAlignment: CrossAxisAlignment.start,
+@@ -249,7 +250,7 @@ class MyCooperativePage extends StatelessWidget {
+             Container(
+               padding: const EdgeInsets.all(10),
+               decoration: const BoxDecoration(
+-                color: Color(0xFF1E5620),
++                color: AppColors.primary,
+                 shape: BoxShape.circle,
+               ),
+               child: Icon(icon, color: Colors.white, size: 22),
+@@ -260,7 +261,7 @@ class MyCooperativePage extends StatelessWidget {
+               style: const TextStyle(
+                 fontSize: 15,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 2),
+@@ -268,7 +269,7 @@ class MyCooperativePage extends StatelessWidget {
+               subtitle,
+               style: const TextStyle(
+                 fontSize: 12,
+-                color: Color(0xFF6B7280),
++                color: AppColors.textTertiary,
+               ),
+             ),
+           ],
+@@ -287,7 +288,7 @@ class MyCooperativePage extends StatelessWidget {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(20),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+@@ -300,14 +301,14 @@ class MyCooperativePage extends StatelessWidget {
+                 style: const TextStyle(
+                   fontSize: 16,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF111827),
++                  color: AppColors.textPrimary,
+                 ),
+               ),
+               Text(
+                 date,
+                 style: const TextStyle(
+                   fontSize: 12,
+-                  color: Color(0xFF9CA3AF),
++                  color: AppColors.textMuted,
+                 ),
+               ),
+             ],
+@@ -317,7 +318,7 @@ class MyCooperativePage extends StatelessWidget {
+             content,
+             style: const TextStyle(
+               fontSize: 14,
+-              color: Color(0xFF4B5563),
++              color: AppColors.textSecondary,
+               height: 1.4,
+             ),
+           ),
+diff --git a/lib/screens/community_forum/well_being_check_in_page.dart b/lib/screens/community_forum/well_being_check_in_page.dart
+index 8abedc7..96406d4 100644
+--- a/lib/screens/community_forum/well_being_check_in_page.dart
++++ b/lib/screens/community_forum/well_being_check_in_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+ 
+ class WellBeingCheckInPage extends StatefulWidget {
+@@ -28,14 +29,14 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+           title,
+           style: const TextStyle(
+             fontWeight: FontWeight.bold,
+-            color: Color(0xFF1E5620),
++            color: AppColors.primary,
+           ),
+         ),
+         content: Text(details),
+         actions: [
+           TextButton(
+             onPressed: () => Navigator.pop(ctx),
+-            child: const Text('Close', style: TextStyle(color: Color(0xFF1E5620), fontWeight: FontWeight.bold)),
++            child: const Text('Close', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+           ),
+         ],
+       ),
+@@ -66,7 +67,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFFF59E0B),
++                  color: AppColors.amber,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+@@ -88,7 +89,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+             Container(
+               padding: const EdgeInsets.all(20),
+               decoration: BoxDecoration(
+-                color: const Color(0xFFFFFBEB),
++                color: AppColors.amberSurface,
+                 borderRadius: BorderRadius.circular(20),
+                 border: Border.all(color: const Color(0xFFFDE68A)),
+               ),
+@@ -97,7 +98,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                   Container(
+                     padding: const EdgeInsets.all(12),
+                     decoration: const BoxDecoration(
+-                      color: Color(0xFFF59E0B),
++                      color: AppColors.amber,
+                       shape: BoxShape.circle,
+                     ),
+                     child: const Icon(
+@@ -116,7 +117,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                           style: TextStyle(
+                             fontSize: 18,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF78350F),
++                            color: AppColors.onAmber,
+                           ),
+                         ),
+                         SizedBox(height: 4),
+@@ -141,7 +142,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+               style: TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 16),
+@@ -164,13 +165,13 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                         padding: const EdgeInsets.all(14),
+                         decoration: BoxDecoration(
+                           color: isSelected
+-                              ? const Color(0xFF1E5620)
++                              ? AppColors.primary
+                               : Colors.white,
+                           shape: BoxShape.circle,
+                           border: Border.all(
+                             color: isSelected
+-                                ? const Color(0xFF1E5620)
+-                                : const Color(0xFFE5E7EB),
++                                ? AppColors.primary
++                                : AppColors.border,
+                             width: isSelected ? 2 : 1,
+                           ),
+                         ),
+@@ -178,7 +179,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                           m['icon'] as IconData,
+                           color: isSelected
+                               ? Colors.white
+-                              : const Color(0xFF6B7280),
++                              : AppColors.textTertiary,
+                           size: 30,
+                         ),
+                       ),
+@@ -191,8 +192,8 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                               ? FontWeight.bold
+                               : FontWeight.normal,
+                           color: isSelected
+-                              ? const Color(0xFF1E5620)
+-                              : const Color(0xFF6B7280),
++                              ? AppColors.primary
++                              : AppColors.textTertiary,
+                         ),
+                       ),
+                     ],
+@@ -208,7 +209,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+               style: TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 14),
+@@ -240,7 +241,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+               height: 52,
+               child: ElevatedButton(
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFF1E5620),
++                  backgroundColor: AppColors.primary,
+                   foregroundColor: Colors.white,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(14),
+@@ -250,7 +251,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                     const SnackBar(
+                       content: Text('Well-being check-in saved!'),
+-                      backgroundColor: Color(0xFF1E5620),
++                      backgroundColor: AppColors.primary,
+                     ),
+                   );
+                   Navigator.pop(context);
+@@ -288,11 +289,11 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+         decoration: BoxDecoration(
+           color: Colors.white,
+           borderRadius: BorderRadius.circular(16),
+-          border: Border.all(color: const Color(0xFFE5E7EB)),
++          border: Border.all(color: AppColors.border),
+         ),
+         child: Row(
+           children: [
+-            Icon(icon, color: const Color(0xFF1E5620), size: 26),
++            Icon(icon, color: AppColors.primary, size: 26),
+             const SizedBox(width: 14),
+             Expanded(
+               child: Column(
+@@ -303,7 +304,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                     style: const TextStyle(
+                       fontSize: 15,
+                       fontWeight: FontWeight.bold,
+-                      color: Color(0xFF111827),
++                      color: AppColors.textPrimary,
+                     ),
+                   ),
+                   const SizedBox(height: 2),
+@@ -311,7 +312,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+                     subtitle,
+                     style: const TextStyle(
+                       fontSize: 13,
+-                      color: Color(0xFF6B7280),
++                      color: AppColors.textTertiary,
+                     ),
+                   ),
+                 ],
+@@ -319,7 +320,7 @@ class _WellBeingCheckInPageState extends State<WellBeingCheckInPage> {
+             ),
+             const Icon(
+               Icons.chevron_right_rounded,
+-              color: Color(0xFF9CA3AF),
++              color: AppColors.textMuted,
+             ),
+           ],
+         ),
+diff --git a/lib/screens/community_forum/women_farmers_circle_page.dart b/lib/screens/community_forum/women_farmers_circle_page.dart
+index 2a8a028..b0948a5 100644
+--- a/lib/screens/community_forum/women_farmers_circle_page.dart
++++ b/lib/screens/community_forum/women_farmers_circle_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+ 
+ class WomenFarmersCirclePage extends StatelessWidget {
+@@ -8,7 +9,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+     ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(
+         content: Text(message),
+-        backgroundColor: const Color(0xFF831843),
++        backgroundColor: AppColors.womenCircleAccent,
+         duration: const Duration(seconds: 3),
+         behavior: SnackBarBehavior.floating,
+       ),
+@@ -39,7 +40,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+@@ -61,7 +62,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+             Container(
+               padding: const EdgeInsets.all(24),
+               decoration: BoxDecoration(
+-                color: const Color(0xFF831843),
++                color: AppColors.womenCircleAccent,
+                 borderRadius: BorderRadius.circular(24),
+               ),
+               child: Column(
+@@ -88,7 +89,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                   ElevatedButton.icon(
+                     style: ElevatedButton.styleFrom(
+                       backgroundColor: Colors.white,
+-                      foregroundColor: const Color(0xFF831843),
++                      foregroundColor: AppColors.womenCircleAccent,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(12),
+                       ),
+@@ -116,7 +117,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+               style: TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 14),
+@@ -126,7 +127,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(20),
+-                border: Border.all(color: const Color(0xFFE5E7EB)),
++                border: Border.all(color: AppColors.border),
+               ),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+@@ -136,12 +137,12 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                       Container(
+                         padding: const EdgeInsets.all(12),
+                         decoration: BoxDecoration(
+-                          color: const Color(0xFF831843).withOpacity(0.1),
++                          color: AppColors.womenCircleAccent.withOpacity(0.1),
+                           borderRadius: BorderRadius.circular(14),
+                         ),
+                         child: const Icon(
+                           Icons.calendar_month_rounded,
+-                          color: Color(0xFF831843),
++                          color: AppColors.womenCircleAccent,
+                           size: 26,
+                         ),
+                       ),
+@@ -155,7 +156,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                               style: TextStyle(
+                                 fontSize: 16,
+                                 fontWeight: FontWeight.bold,
+-                                color: Color(0xFF111827),
++                                color: AppColors.textPrimary,
+                               ),
+                             ),
+                             SizedBox(height: 2),
+@@ -163,7 +164,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                               'Friday, Oct 27 • 2:00 PM',
+                               style: TextStyle(
+                                 fontSize: 13,
+-                                color: Color(0xFF831843),
++                                color: AppColors.womenCircleAccent,
+                                 fontWeight: FontWeight.w600,
+                               ),
+                             ),
+@@ -177,7 +178,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                     'Location: Musanze Community Center',
+                     style: TextStyle(
+                       fontSize: 14,
+-                      color: Color(0xFF4B5563),
++                      color: AppColors.textSecondary,
+                     ),
+                   ),
+                   const SizedBox(height: 16),
+@@ -186,13 +187,19 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                     height: 44,
+                     child: ElevatedButton(
+                       style: ElevatedButton.styleFrom(
+-                        backgroundColor: const Color(0xFF1E5620),
++                        backgroundColor: AppColors.primary,
+                         foregroundColor: Colors.white,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(12),
+                         ),
+                       ),
+-                      onPressed: () {},
++                      onPressed: () {
++                        _showFeedback(
++                          context,
++                          'You have registered for the next Women Farmers '
++                          'Circle meeting. See you at the Musanze Community Center!',
++                        );
++                      },
+                       child: const Text(
+                         'Register Now',
+                         style: TextStyle(fontWeight: FontWeight.bold),
+@@ -210,7 +217,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+               style: TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 14),
+@@ -249,7 +256,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(20),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+@@ -258,11 +265,11 @@ class WomenFarmersCirclePage extends StatelessWidget {
+             children: [
+               CircleAvatar(
+                 radius: 18,
+-                backgroundColor: const Color(0xFF831843).withOpacity(0.12),
++                backgroundColor: AppColors.womenCircleAccent.withOpacity(0.12),
+                 child: Text(
+                   author.substring(0, 1),
+                   style: const TextStyle(
+-                    color: Color(0xFF831843),
++                    color: AppColors.womenCircleAccent,
+                     fontWeight: FontWeight.bold,
+                   ),
+                 ),
+@@ -276,14 +283,14 @@ class WomenFarmersCirclePage extends StatelessWidget {
+                     style: const TextStyle(
+                       fontSize: 15,
+                       fontWeight: FontWeight.bold,
+-                      color: Color(0xFF111827),
++                      color: AppColors.textPrimary,
+                     ),
+                   ),
+                   Text(
+                     timeAgo,
+                     style: const TextStyle(
+                       fontSize: 12,
+-                      color: Color(0xFF6B7280),
++                      color: AppColors.textTertiary,
+                     ),
+                   ),
+                 ],
+@@ -296,7 +303,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+             style: const TextStyle(
+               fontSize: 16,
+               fontWeight: FontWeight.bold,
+-              color: Color(0xFF111827),
++              color: AppColors.textPrimary,
+             ),
+           ),
+           const SizedBox(height: 6),
+@@ -304,7 +311,7 @@ class WomenFarmersCirclePage extends StatelessWidget {
+             content,
+             style: const TextStyle(
+               fontSize: 14,
+-              color: Color(0xFF4B5563),
++              color: AppColors.textSecondary,
+               height: 1.4,
+             ),
+           ),
+diff --git a/lib/screens/crop_incident/crop_advisory_page.dart b/lib/screens/crop_incident/crop_advisory_page.dart
+index 4c8c1f0..b990950 100644
+--- a/lib/screens/crop_incident/crop_advisory_page.dart
++++ b/lib/screens/crop_incident/crop_advisory_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+ import '../weather_calendar/weather_forecast_detail_page.dart';
+ import 'add_edit_incident_page.dart';
+@@ -32,7 +33,7 @@ class CropAdvisoryPage extends StatelessWidget {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+@@ -55,7 +56,7 @@ class CropAdvisoryPage extends StatelessWidget {
+               style: TextStyle(
+                 fontSize: 12,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF78350F),
++                color: AppColors.onAmber,
+                 letterSpacing: 1.0,
+               ),
+             ),
+@@ -64,7 +65,7 @@ class CropAdvisoryPage extends StatelessWidget {
+               'Recommended Actions',
+               style: theme.textTheme.headlineSmall?.copyWith(
+                 fontWeight: FontWeight.bold,
+-                color: const Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 8),
+@@ -72,7 +73,7 @@ class CropAdvisoryPage extends StatelessWidget {
+               'Based on the heavy rains forecast for Northern Province over the next 48 hours.',
+               style: TextStyle(
+                 fontSize: 15,
+-                color: Color(0xFF4B5563),
++                color: AppColors.textSecondary,
+                 height: 1.35,
+               ),
+             ),
+@@ -86,12 +87,12 @@ class CropAdvisoryPage extends StatelessWidget {
+               description:
+                   'Soil saturation level is high. Planting now increases risk of seed rot.',
+               statusText: 'Wait',
+-              statusBg: const Color(0xFFF59E0B),
++              statusBg: AppColors.amber,
+               statusTextColor: Colors.white,
+               actionText: 'View Advice >',
+               isActionAlert: false,
+               cardBg: Colors.white,
+-              borderColor: const Color(0xFFE5E7EB),
++              borderColor: AppColors.border,
+               onTap: () {
+                 Navigator.of(context).push(
+                   MaterialPageRoute(
+@@ -110,12 +111,12 @@ class CropAdvisoryPage extends StatelessWidget {
+               description:
+                   'Current growth stage is resilient to upcoming weather conditions.',
+               statusText: 'Safe',
+-              statusBg: const Color(0xFF1E5620),
++              statusBg: AppColors.primary,
+               statusTextColor: Colors.white,
+               actionText: 'View Details >',
+               isActionAlert: false,
+               cardBg: Colors.white,
+-              borderColor: const Color(0xFFE5E7EB),
++              borderColor: AppColors.border,
+               onTap: () {
+                 Navigator.of(context).push(
+                   MaterialPageRoute(
+@@ -134,7 +135,7 @@ class CropAdvisoryPage extends StatelessWidget {
+               description:
+                   'High humidity creates ideal conditions for Late Blight fungus.',
+               statusText: 'At Risk',
+-              statusBg: const Color(0xFFDC2626),
++              statusBg: AppColors.error,
+               statusTextColor: Colors.white,
+               actionText: 'Report Damage / Infection >',
+               isActionAlert: true,
+@@ -189,9 +190,9 @@ class CropAdvisoryPage extends StatelessWidget {
+                   decoration: BoxDecoration(
+                     color: Colors.white,
+                     borderRadius: BorderRadius.circular(14),
+-                    border: Border.all(color: const Color(0xFFE5E7EB)),
++                    border: Border.all(color: AppColors.border),
+                   ),
+-                  child: Icon(icon, color: const Color(0xFF1E5620), size: 28),
++                  child: Icon(icon, color: AppColors.primary, size: 28),
+                 ),
+                 Container(
+                   padding: const EdgeInsets.symmetric(
+@@ -219,7 +220,7 @@ class CropAdvisoryPage extends StatelessWidget {
+               style: const TextStyle(
+                 fontSize: 22,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 6),
+@@ -227,7 +228,7 @@ class CropAdvisoryPage extends StatelessWidget {
+               description,
+               style: const TextStyle(
+                 fontSize: 14,
+-                color: Color(0xFF4B5563),
++                color: AppColors.textSecondary,
+                 height: 1.4,
+               ),
+             ),
+@@ -240,8 +241,8 @@ class CropAdvisoryPage extends StatelessWidget {
+                     fontSize: 15,
+                     fontWeight: FontWeight.bold,
+                     color: isActionAlert
+-                        ? const Color(0xFFDC2626)
+-                        : const Color(0xFF1E5620),
++                        ? AppColors.error
++                        : AppColors.primary,
+                   ),
+                 ),
+               ],
+diff --git a/lib/screens/crop_incident/incident_detail_page.dart b/lib/screens/crop_incident/incident_detail_page.dart
+index 1fa7b51..9019a6f 100644
+--- a/lib/screens/crop_incident/incident_detail_page.dart
++++ b/lib/screens/crop_incident/incident_detail_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import 'package:intl/intl.dart';
+ import '../../../core/utils/i18n_strings.dart';
+@@ -70,7 +71,7 @@ class IncidentDetailPage extends StatelessWidget {
+               '${I18nStrings.get('crop_name', langCode)}: ${incident.cropName}',
+               style: theme.textTheme.headlineSmall?.copyWith(
+                 fontWeight: FontWeight.bold,
+-                color: const Color(0xFF1E5631),
++                color: AppColors.primary,
+               ),
+             ),
+             const SizedBox(height: 8),
+@@ -102,20 +103,20 @@ class IncidentDetailPage extends StatelessWidget {
+             Container(
+               padding: const EdgeInsets.all(16),
+               decoration: BoxDecoration(
+-                color: const Color(0xFF1E5631).withValues(alpha: 0.08),
++                color: AppColors.primary.withValues(alpha: 0.08),
+                 borderRadius: BorderRadius.circular(12),
+-                border: Border.all(color: const Color(0xFF1E5631)),
++                border: Border.all(color: AppColors.primary),
+               ),
+               child: Row(
+                 children: [
+-                  const Icon(Icons.info_outline, color: Color(0xFF1E5631)),
++                  const Icon(Icons.info_outline, color: AppColors.primary),
+                   const SizedBox(width: 12),
+                   Expanded(
+                     child: Text(
+                       'Status: ${incident.status} • Tracked via AgroSafe Cloud',
+                       style: const TextStyle(
+                         fontWeight: FontWeight.bold,
+-                        color: Color(0xFF1E5631),
++                        color: AppColors.primary,
+                       ),
+                     ),
+                   ),
+diff --git a/lib/screens/crop_incident/incident_list_page.dart b/lib/screens/crop_incident/incident_list_page.dart
+index d235f90..ca9eb62 100644
+--- a/lib/screens/crop_incident/incident_list_page.dart
++++ b/lib/screens/crop_incident/incident_list_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../../core/utils/i18n_strings.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
+@@ -76,7 +77,7 @@ class _IncidentListPageState extends State<IncidentListPage> {
+                     child: ChoiceChip(
+                       label: Text(severity),
+                       selected: isSelected,
+-                      selectedColor: const Color(0xFF1E5631),
++                      selectedColor: AppColors.primary,
+                       labelStyle: TextStyle(
+                         color: isSelected ? Colors.white : null,
+                         fontWeight: FontWeight.bold,
+@@ -193,7 +194,7 @@ class _IncidentListPageState extends State<IncidentListPage> {
+             ),
+           );
+         },
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: AppColors.primary,
+         foregroundColor: Colors.white,
+         icon: const Icon(Icons.add_alert_rounded),
+         label: Text(I18nStrings.get('add_incident', langCode)),
+diff --git a/lib/screens/main_navigation/high_contrast_home_view.dart b/lib/screens/main_navigation/high_contrast_home_view.dart
+index 5b83326..2b99345 100644
+--- a/lib/screens/main_navigation/high_contrast_home_view.dart
++++ b/lib/screens/main_navigation/high_contrast_home_view.dart
+@@ -1,9 +1,25 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
++
++import '../../features/auth/domain/entities/user_entity.dart';
++import '../crop_incident/incident_list_page.dart';
++import '../community_forum/women_farmers_circle_page.dart';
++import '../safety_misinformation/safety_scam_page.dart';
++import '../weather_calendar/weather_calendar_page.dart';
+ 
+ class HighContrastHomeView extends StatelessWidget {
++  final UserEntity user;
+   final VoidCallback onExitHighContrast;
+ 
+-  const HighContrastHomeView({super.key, required this.onExitHighContrast});
++  const HighContrastHomeView({
++    super.key,
++    required this.user,
++    required this.onExitHighContrast,
++  });
++
++  void _open(BuildContext context, Widget page) {
++    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
++  }
+ 
+   @override
+   Widget build(BuildContext context) {
+@@ -11,12 +27,12 @@ class HighContrastHomeView extends StatelessWidget {
+       backgroundColor: Colors.black,
+       appBar: AppBar(
+         backgroundColor: Colors.black,
+-        foregroundColor: const Color(0xFFFFFF00),
++        foregroundColor: AppColors.highContrastYellow,
+         title: const Text(
+           'AGROSAFE HIGH CONTRAST',
+           style: TextStyle(
+             fontWeight: FontWeight.bold,
+-            color: Color(0xFFFFFF00),
++            color: AppColors.highContrastYellow,
+             letterSpacing: 1.2,
+           ),
+         ),
+@@ -24,7 +40,7 @@ class HighContrastHomeView extends StatelessWidget {
+           IconButton(
+             icon: const Icon(
+               Icons.close_rounded,
+-              color: Color(0xFFFFFF00),
++              color: AppColors.highContrastYellow,
+               size: 36,
+             ),
+             onPressed: onExitHighContrast,
+@@ -42,7 +58,7 @@ class HighContrastHomeView extends StatelessWidget {
+               decoration: BoxDecoration(
+                 color: Colors.black,
+                 borderRadius: BorderRadius.circular(16),
+-                border: Border.all(color: const Color(0xFFFFFF00), width: 3),
++                border: Border.all(color: AppColors.highContrastYellow, width: 3),
+               ),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+@@ -51,14 +67,14 @@ class HighContrastHomeView extends StatelessWidget {
+                     children: [
+                       Icon(
+                         Icons.warning_amber_rounded,
+-                        color: Color(0xFFFFFF00),
++                        color: AppColors.highContrastYellow,
+                         size: 40,
+                       ),
+                       SizedBox(width: 12),
+                       Text(
+                         'FLOOD WARNING',
+                         style: TextStyle(
+-                          color: Color(0xFFFFFF00),
++                          color: AppColors.highContrastYellow,
+                           fontSize: 22,
+                           fontWeight: FontWeight.bold,
+                         ),
+@@ -82,25 +98,25 @@ class HighContrastHomeView extends StatelessWidget {
+             _buildHighContrastButton(
+               icon: Icons.calendar_today_rounded,
+               label: '1. PLANTING CALENDAR',
+-              onTap: () {},
++              onTap: () => _open(context, const WeatherCalendarPage()),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.security_rounded,
+               label: '2. SCAM ALERTS',
+-              onTap: () {},
++              onTap: () => _open(context, const SafetyScamPage()),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.bug_report_rounded,
+               label: '3. CROP INCIDENTS',
+-              onTap: () {},
++              onTap: () => _open(context, IncidentListPage(user: user)),
+             ),
+             const SizedBox(height: 16),
+             _buildHighContrastButton(
+               icon: Icons.groups_rounded,
+               label: '4. WOMEN CIRCLE',
+-              onTap: () {},
++              onTap: () => _open(context, const WomenFarmersCirclePage()),
+             ),
+           ],
+         ),
+@@ -116,7 +132,7 @@ class HighContrastHomeView extends StatelessWidget {
+     return Container(
+       height: 72,
+       decoration: BoxDecoration(
+-        color: const Color(0xFFFFFF00),
++        color: AppColors.highContrastYellow,
+         borderRadius: BorderRadius.circular(16),
+       ),
+       child: InkWell(
+diff --git a/lib/screens/main_navigation/home_hub_view.dart b/lib/screens/main_navigation/home_hub_view.dart
+index c15f9e5..4701c1a 100644
+--- a/lib/screens/main_navigation/home_hub_view.dart
++++ b/lib/screens/main_navigation/home_hub_view.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../../core/services/weather_service.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
+@@ -79,6 +80,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+               Navigator.of(context).push(
+                 MaterialPageRoute(
+                   builder: (_) => HighContrastHomeView(
++                    user: widget.user,
+                     onExitHighContrast: () => Navigator.pop(context),
+                   ),
+                 ),
+@@ -86,7 +88,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+             },
+           ),
+           IconButton(
+-            icon: const Icon(Icons.logout_rounded, color: Color(0xFFDC2626)),
++            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+             tooltip: 'Sign Out',
+             onPressed: () {
+               context.read<AuthBloc>().add(AuthSignOutSubmitted());
+@@ -117,7 +119,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                             : 'Good morning, ${widget.user.fullName.split(' ').first}',
+                         style: theme.textTheme.headlineMedium?.copyWith(
+                           fontWeight: FontWeight.bold,
+-                          color: const Color(0xFF111827),
++                          color: AppColors.textPrimary,
+                         ),
+                       ),
+                       const SizedBox(height: 4),
+@@ -127,7 +129,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                             : 'Welcome back to your farm overview.',
+                         style: const TextStyle(
+                           fontSize: 15,
+-                          color: Color(0xFF4B5563),
++                          color: AppColors.textSecondary,
+                         ),
+                       ),
+                     ],
+@@ -145,11 +147,11 @@ class _HomeHubViewState extends State<HomeHubView> {
+                     width: 52,
+                     height: 52,
+                     decoration: BoxDecoration(
+-                      color: const Color(0xFFF59E0B),
++                      color: AppColors.amber,
+                       shape: BoxShape.circle,
+                       boxShadow: [
+                         BoxShadow(
+-                          color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
++                          color: AppColors.amber.withValues(alpha: 0.3),
+                           blurRadius: 10,
+                           offset: const Offset(0, 4),
+                         ),
+@@ -170,7 +172,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+             Container(
+               padding: const EdgeInsets.all(20),
+               decoration: BoxDecoration(
+-                color: const Color(0xFFF59E0B),
++                color: AppColors.amber,
+                 borderRadius: BorderRadius.circular(20),
+               ),
+               child: Column(
+@@ -181,7 +183,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                       const Icon(
+                         Icons.wb_sunny_outlined,
+                         size: 36,
+-                        color: Color(0xFF78350F),
++                        color: AppColors.onAmber,
+                       ),
+                       const SizedBox(width: 12),
+                       Text(
+@@ -189,7 +191,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                         style: const TextStyle(
+                           fontSize: 32,
+                           fontWeight: FontWeight.bold,
+-                          color: Color(0xFF78350F),
++                          color: AppColors.onAmber,
+                         ),
+                       ),
+                       const SizedBox(width: 8),
+@@ -198,7 +200,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                         style: const TextStyle(
+                           fontSize: 15,
+                           fontWeight: FontWeight.w600,
+-                          color: Color(0xFF78350F),
++                          color: AppColors.onAmber,
+                         ),
+                       ),
+                       const Spacer(),
+@@ -208,7 +210,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                           vertical: 6,
+                         ),
+                         decoration: BoxDecoration(
+-                          color: const Color(0xFF78350F),
++                          color: AppColors.onAmber,
+                           borderRadius: BorderRadius.circular(12),
+                         ),
+                         child: const Text(
+@@ -232,7 +234,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                       const Icon(
+                         Icons.lightbulb_outline_rounded,
+                         size: 20,
+-                        color: Color(0xFF78350F),
++                        color: AppColors.onAmber,
+                       ),
+                       const SizedBox(width: 10),
+                       Expanded(
+@@ -242,7 +244,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+                               : 'Ideal conditions for weeding maize today. High visibility and dry soil.',
+                           style: const TextStyle(
+                             fontSize: 14,
+-                            color: Color(0xFF78350F),
++                            color: AppColors.onAmber,
+                             height: 1.35,
+                             fontWeight: FontWeight.w500,
+                           ),
+@@ -358,7 +360,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+         decoration: BoxDecoration(
+           color: Colors.white,
+           borderRadius: BorderRadius.circular(20),
+-          border: Border.all(color: const Color(0xFFE5E7EB)),
++          border: Border.all(color: AppColors.border),
+         ),
+         child: Column(
+           mainAxisAlignment: MainAxisAlignment.center,
+@@ -366,7 +368,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+             Container(
+               padding: const EdgeInsets.all(16),
+               decoration: const BoxDecoration(
+-                color: Color(0xFF1E5620),
++                color: AppColors.primary,
+                 shape: BoxShape.circle,
+               ),
+               child: Icon(icon, color: Colors.white, size: 32),
+@@ -377,7 +379,7 @@ class _HomeHubViewState extends State<HomeHubView> {
+               style: const TextStyle(
+                 fontSize: 18,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+           ],
+diff --git a/lib/screens/main_navigation/main_navigation_page.dart b/lib/screens/main_navigation/main_navigation_page.dart
+index fdc1d70..a08c173 100644
+--- a/lib/screens/main_navigation/main_navigation_page.dart
++++ b/lib/screens/main_navigation/main_navigation_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
+ import '../../features/settings_profile/presentation/cubit/settings_cubit.dart';
+@@ -44,7 +45,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
+       bottomNavigationBar: NavigationBar(
+         selectedIndex: _currentIndex,
+         backgroundColor: Colors.white,
+-        indicatorColor: const Color(0xFF1E5620).withValues(alpha: 0.12),
++        indicatorColor: AppColors.primary.withValues(alpha: 0.12),
+         onDestinationSelected: (index) {
+           setState(() {
+             _currentIndex = index;
+@@ -55,7 +56,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
+             icon: const Icon(Icons.home_outlined),
+             selectedIcon: const Icon(
+               Icons.home_rounded,
+-              color: Color(0xFF1E5620),
++              color: AppColors.primary,
+             ),
+             label: isRw ? 'Ahabanza' : 'Home',
+           ),
+@@ -63,7 +64,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
+             icon: const Icon(Icons.cloud_outlined),
+             selectedIcon: const Icon(
+               Icons.cloud_rounded,
+-              color: Color(0xFF1E5620),
++              color: AppColors.primary,
+             ),
+             label: isRw ? 'Ikirere' : 'Weather',
+           ),
+@@ -71,7 +72,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
+             icon: const Icon(Icons.shield_outlined),
+             selectedIcon: const Icon(
+               Icons.shield_rounded,
+-              color: Color(0xFF1E5620),
++              color: AppColors.primary,
+             ),
+             label: isRw ? 'Ubutekamutwe' : 'Safety',
+           ),
+@@ -79,7 +80,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
+             icon: const Icon(Icons.people_outline_rounded),
+             selectedIcon: const Icon(
+               Icons.people_rounded,
+-              color: Color(0xFF1E5620),
++              color: AppColors.primary,
+             ),
+             label: isRw ? 'Umuryango' : 'Community',
+           ),
+@@ -87,7 +88,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
+             icon: const Icon(Icons.settings_outlined),
+             selectedIcon: const Icon(
+               Icons.settings_rounded,
+-              color: Color(0xFF1E5620),
++              color: AppColors.primary,
+             ),
+             label: isRw ? 'Igenamiterere' : 'Settings',
+           ),
+diff --git a/lib/screens/main_navigation/voice_navigation_modal.dart b/lib/screens/main_navigation/voice_navigation_modal.dart
+index dba3d7c..d000389 100644
+--- a/lib/screens/main_navigation/voice_navigation_modal.dart
++++ b/lib/screens/main_navigation/voice_navigation_modal.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import '../../../core/services/audio_service.dart';
+ 
+ class VoiceNavigationModal extends StatefulWidget {
+@@ -44,7 +45,7 @@ class _VoiceNavigationModalState extends State<VoiceNavigationModal>
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+-      backgroundColor: const Color(0xFF1E5620),
++      backgroundColor: AppColors.primary,
+       appBar: AppBar(
+         backgroundColor: Colors.transparent,
+         elevation: 0,
+@@ -96,7 +97,7 @@ class _VoiceNavigationModalState extends State<VoiceNavigationModal>
+                           return Container(
+                             padding: EdgeInsets.all(20 + (_animController.value * 10)),
+                             decoration: BoxDecoration(
+-                              color: const Color(0xFFF59E0B).withValues(
++                              color: AppColors.amber.withValues(
+                                 alpha: 0.2 + (_animController.value * 0.15),
+                               ),
+                               shape: BoxShape.circle,
+@@ -104,7 +105,7 @@ class _VoiceNavigationModalState extends State<VoiceNavigationModal>
+                             child: Container(
+                               padding: const EdgeInsets.all(20),
+                               decoration: const BoxDecoration(
+-                                color: Color(0xFFF59E0B),
++                                color: AppColors.amber,
+                                 shape: BoxShape.circle,
+                               ),
+                               child: const Icon(
+@@ -123,14 +124,14 @@ class _VoiceNavigationModalState extends State<VoiceNavigationModal>
+                       Container(
+                         padding: const EdgeInsets.all(16),
+                         decoration: BoxDecoration(
+-                          color: const Color(0xFFF59E0B),
++                          color: AppColors.amber,
+                           borderRadius: BorderRadius.circular(18),
+                         ),
+                         child: const Row(
+                           children: [
+                             Icon(
+                               Icons.volume_up_rounded,
+-                              color: Color(0xFF78350F),
++                              color: AppColors.onAmber,
+                               size: 24,
+                             ),
+                             SizedBox(width: 12),
+@@ -143,7 +144,7 @@ class _VoiceNavigationModalState extends State<VoiceNavigationModal>
+                                     style: TextStyle(
+                                       fontSize: 14,
+                                       fontWeight: FontWeight.bold,
+-                                      color: Color(0xFF78350F),
++                                      color: AppColors.onAmber,
+                                     ),
+                                   ),
+                                   SizedBox(height: 2),
+@@ -151,7 +152,7 @@ class _VoiceNavigationModalState extends State<VoiceNavigationModal>
+                                     'AgroSafe irimo kumva ijwi ryawe mu Kinyarwanda.',
+                                     style: TextStyle(
+                                       fontSize: 12,
+-                                      color: Color(0xFF78350F),
++                                      color: AppColors.onAmber,
+                                     ),
+                                   ),
+                                 ],
+diff --git a/lib/screens/onboarding/onboarding_accessibility_page.dart b/lib/screens/onboarding/onboarding_accessibility_page.dart
+index 7845408..0b07b03 100644
+--- a/lib/screens/onboarding/onboarding_accessibility_page.dart
++++ b/lib/screens/onboarding/onboarding_accessibility_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
+ import '../../features/settings_profile/presentation/cubit/settings_cubit.dart';
+@@ -45,11 +46,11 @@ class _OnboardingAccessibilityPageState
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 shape: BoxShape.circle,
+-                border: Border.all(color: const Color(0xFFE5E7EB)),
++                border: Border.all(color: AppColors.border),
+               ),
+               child: const Icon(
+                 Icons.volume_up_rounded,
+-                color: Color(0xFF1E5620),
++                color: AppColors.primary,
+                 size: 22,
+               ),
+             ),
+@@ -69,7 +70,7 @@ class _OnboardingAccessibilityPageState
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFF1E5620),
++                        color: AppColors.primary,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -79,7 +80,7 @@ class _OnboardingAccessibilityPageState
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFF1E5620),
++                        color: AppColors.primary,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -89,7 +90,7 @@ class _OnboardingAccessibilityPageState
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFF59E0B),
++                        color: AppColors.amber,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -103,7 +104,7 @@ class _OnboardingAccessibilityPageState
+                 'How would you like to use the app?',
+                 style: theme.textTheme.headlineMedium?.copyWith(
+                   fontWeight: FontWeight.bold,
+-                  color: const Color(0xFF111827),
++                  color: AppColors.textPrimary,
+                 ),
+               ),
+               const SizedBox(height: 8),
+@@ -112,7 +113,7 @@ class _OnboardingAccessibilityPageState
+                 'Customize AgroSafe to fit your needs for better accessibility in the field.',
+                 style: TextStyle(
+                   fontSize: 15,
+-                  color: Color(0xFF4B5563),
++                  color: AppColors.textSecondary,
+                   height: 1.4,
+                 ),
+               ),
+@@ -195,14 +196,14 @@ class _OnboardingAccessibilityPageState
+               Container(
+                 padding: const EdgeInsets.all(16),
+                 decoration: BoxDecoration(
+-                  color: const Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   borderRadius: BorderRadius.circular(16),
+                 ),
+                 child: const Row(
+                   children: [
+                     Icon(
+                       Icons.verified_user_outlined,
+-                      color: Color(0xFFF59E0B),
++                      color: AppColors.amber,
+                       size: 24,
+                     ),
+                     SizedBox(width: 14),
+@@ -226,7 +227,7 @@ class _OnboardingAccessibilityPageState
+                 height: 54,
+                 child: ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+-                    backgroundColor: const Color(0xFF1E5620),
++                    backgroundColor: AppColors.primary,
+                     foregroundColor: Colors.white,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12),
+@@ -280,7 +281,7 @@ class _OnboardingAccessibilityPageState
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(16),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Row(
+         crossAxisAlignment: CrossAxisAlignment.start,
+@@ -291,7 +292,7 @@ class _OnboardingAccessibilityPageState
+               color: const Color(0xFFF3F4F6),
+               borderRadius: BorderRadius.circular(12),
+             ),
+-            child: Icon(icon, color: const Color(0xFF1E5620), size: 24),
++            child: Icon(icon, color: AppColors.primary, size: 24),
+           ),
+           const SizedBox(width: 14),
+           Expanded(
+@@ -303,7 +304,7 @@ class _OnboardingAccessibilityPageState
+                   style: const TextStyle(
+                     fontSize: 16,
+                     fontWeight: FontWeight.bold,
+-                    color: Color(0xFF111827),
++                    color: AppColors.textPrimary,
+                   ),
+                 ),
+                 const SizedBox(height: 4),
+@@ -311,7 +312,7 @@ class _OnboardingAccessibilityPageState
+                   subtitle,
+                   style: const TextStyle(
+                     fontSize: 13,
+-                    color: Color(0xFF6B7280),
++                    color: AppColors.textTertiary,
+                     height: 1.3,
+                   ),
+                 ),
+@@ -321,7 +322,7 @@ class _OnboardingAccessibilityPageState
+           const SizedBox(width: 8),
+           Switch(
+             value: value,
+-            activeColor: const Color(0xFF1E5620),
++            activeColor: AppColors.primary,
+             onChanged: onChanged,
+           ),
+         ],
+diff --git a/lib/screens/onboarding/onboarding_farm_page.dart b/lib/screens/onboarding/onboarding_farm_page.dart
+index e1c8d70..fd92a32 100644
+--- a/lib/screens/onboarding/onboarding_farm_page.dart
++++ b/lib/screens/onboarding/onboarding_farm_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'onboarding_accessibility_page.dart';
+ 
+ class OnboardingFarmPage extends StatefulWidget {
+@@ -39,7 +40,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+               width: 44,
+               height: 44,
+               decoration: const BoxDecoration(
+-                color: Color(0xFFF59E0B),
++                color: AppColors.amber,
+                 shape: BoxShape.circle,
+               ),
+               child: const Icon(
+@@ -64,7 +65,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFF1E5620),
++                        color: AppColors.primary,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -74,7 +75,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFF59E0B),
++                        color: AppColors.amber,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -84,7 +85,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFE5E7EB),
++                        color: AppColors.border,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -100,7 +101,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                   height: 160,
+                   width: double.infinity,
+                   decoration: const BoxDecoration(
+-                    color: Color(0xFF2E7D32),
++                    color: AppColors.primary,
+                     image: DecorationImage(
+                       image: NetworkImage(
+                         'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80',
+@@ -117,7 +118,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                 'Tell us about your farm.',
+                 style: theme.textTheme.headlineMedium?.copyWith(
+                   fontWeight: FontWeight.bold,
+-                  color: const Color(0xFF111827),
++                  color: AppColors.textPrimary,
+                 ),
+               ),
+               const SizedBox(height: 20),
+@@ -128,7 +129,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                 style: TextStyle(
+                   fontSize: 14,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF374151),
++                  color: AppColors.textStrong,
+                 ),
+               ),
+               const SizedBox(height: 8),
+@@ -138,7 +139,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                   hintText: 'e.g., Musanze',
+                   suffixIcon: Icon(
+                     Icons.location_on_outlined,
+-                    color: Color(0xFF374151),
++                    color: AppColors.textStrong,
+                   ),
+                 ),
+               ),
+@@ -150,7 +151,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                 style: TextStyle(
+                   fontSize: 14,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF374151),
++                  color: AppColors.textStrong,
+                 ),
+               ),
+               const SizedBox(height: 8),
+@@ -168,7 +169,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                     value: 'Select your primary crop',
+                     child: Text(
+                       'Select your primary crop',
+-                      style: TextStyle(color: Color(0xFF6B7280)),
++                      style: TextStyle(color: AppColors.textTertiary),
+                     ),
+                   ),
+                   DropdownMenuItem(value: 'Maize', child: Text('Maize')),
+@@ -198,8 +199,8 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                           borderRadius: BorderRadius.circular(16),
+                           border: Border.all(
+                             color: _selectedCategory == 'Cereals'
+-                                ? const Color(0xFF1E5620)
+-                                : const Color(0xFFE5E7EB),
++                                ? AppColors.primary
++                                : AppColors.border,
+                             width: _selectedCategory == 'Cereals' ? 2 : 1,
+                           ),
+                         ),
+@@ -210,8 +211,8 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                               Icons.grass_rounded,
+                               size: 32,
+                               color: _selectedCategory == 'Cereals'
+-                                  ? const Color(0xFF1E5620)
+-                                  : const Color(0xFF4B5563),
++                                  ? AppColors.primary
++                                  : AppColors.textSecondary,
+                             ),
+                             const SizedBox(height: 8),
+                             Text(
+@@ -219,8 +220,8 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                               style: TextStyle(
+                                 fontWeight: FontWeight.bold,
+                                 color: _selectedCategory == 'Cereals'
+-                                    ? const Color(0xFF111827)
+-                                    : const Color(0xFF4B5563),
++                                    ? AppColors.textPrimary
++                                    : AppColors.textSecondary,
+                               ),
+                             ),
+                           ],
+@@ -240,8 +241,8 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                           borderRadius: BorderRadius.circular(16),
+                           border: Border.all(
+                             color: _selectedCategory == 'Tree Crops'
+-                                ? const Color(0xFF1E5620)
+-                                : const Color(0xFFE5E7EB),
++                                ? AppColors.primary
++                                : AppColors.border,
+                             width: _selectedCategory == 'Tree Crops' ? 2 : 1,
+                           ),
+                         ),
+@@ -252,8 +253,8 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                               Icons.park_outlined,
+                               size: 32,
+                               color: _selectedCategory == 'Tree Crops'
+-                                  ? const Color(0xFF1E5620)
+-                                  : const Color(0xFF4B5563),
++                                  ? AppColors.primary
++                                  : AppColors.textSecondary,
+                             ),
+                             const SizedBox(height: 8),
+                             Text(
+@@ -261,8 +262,8 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                               style: TextStyle(
+                                 fontWeight: FontWeight.bold,
+                                 color: _selectedCategory == 'Tree Crops'
+-                                    ? const Color(0xFF111827)
+-                                    : const Color(0xFF4B5563),
++                                    ? AppColors.textPrimary
++                                    : AppColors.textSecondary,
+                               ),
+                             ),
+                           ],
+@@ -279,7 +280,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                 height: 54,
+                 child: ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+-                    backgroundColor: const Color(0xFF1E5620),
++                    backgroundColor: AppColors.primary,
+                     foregroundColor: Colors.white,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12),
+@@ -318,7 +319,7 @@ class _OnboardingFarmPageState extends State<OnboardingFarmPage> {
+                 style: TextStyle(
+                   fontSize: 14,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF6B7280),
++                  color: AppColors.textTertiary,
+                 ),
+               ),
+               const SizedBox(height: 12),
+diff --git a/lib/screens/onboarding/onboarding_language_page.dart b/lib/screens/onboarding/onboarding_language_page.dart
+index 932eac3..5ee3752 100644
+--- a/lib/screens/onboarding/onboarding_language_page.dart
++++ b/lib/screens/onboarding/onboarding_language_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../../core/services/audio_service.dart';
+ import '../../features/settings_profile/presentation/cubit/settings_cubit.dart';
+@@ -50,7 +51,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   shape: BoxShape.circle,
+                 ),
+                 child: Icon(
+@@ -76,7 +77,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFF1E5620),
++                        color: AppColors.primary,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -86,7 +87,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFF59E0B),
++                        color: AppColors.amber,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -96,7 +97,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFE5E7EB),
++                        color: AppColors.border,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -106,7 +107,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFE5E7EB),
++                        color: AppColors.border,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -121,7 +122,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                 textAlign: TextAlign.center,
+                 style: theme.textTheme.headlineMedium?.copyWith(
+                   fontWeight: FontWeight.bold,
+-                  color: const Color(0xFF111827),
++                  color: AppColors.textPrimary,
+                 ),
+               ),
+               const SizedBox(height: 12),
+@@ -131,7 +132,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                 textAlign: TextAlign.center,
+                 style: TextStyle(
+                   fontSize: 16,
+-                  color: Color(0xFF4B5563),
++                  color: AppColors.textSecondary,
+                   height: 1.4,
+                 ),
+               ),
+@@ -155,14 +156,14 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                           borderRadius: BorderRadius.circular(16),
+                           border: Border.all(
+                             color: _selectedLanguage == 'rw'
+-                                ? const Color(0xFF1E5620)
+-                                : const Color(0xFFD1D5DB),
++                                ? AppColors.primary
++                                : AppColors.borderStrong,
+                             width: _selectedLanguage == 'rw' ? 2.5 : 1.2,
+                           ),
+                           boxShadow: _selectedLanguage == 'rw'
+                               ? [
+                                   BoxShadow(
+-                                    color: const Color(0xFF1E5620)
++                                    color: AppColors.primary
+                                         .withOpacity(0.08),
+                                     blurRadius: 10,
+                                     offset: const Offset(0, 4),
+@@ -203,7 +204,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                                     Expanded(
+                                       flex: 1,
+                                       child: Container(
+-                                        color: const Color(0xFF20603D),
++                                        color: AppColors.primary,
+                                       ),
+                                     ),
+                                   ],
+@@ -216,7 +217,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                               style: TextStyle(
+                                 fontSize: 18,
+                                 fontWeight: FontWeight.bold,
+-                                color: Color(0xFF111827),
++                                color: AppColors.textPrimary,
+                               ),
+                             ),
+                           ],
+@@ -240,14 +241,14 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                           borderRadius: BorderRadius.circular(16),
+                           border: Border.all(
+                             color: _selectedLanguage == 'en'
+-                                ? const Color(0xFF1E5620)
+-                                : const Color(0xFFD1D5DB),
++                                ? AppColors.primary
++                                : AppColors.borderStrong,
+                             width: _selectedLanguage == 'en' ? 2.5 : 1.2,
+                           ),
+                           boxShadow: _selectedLanguage == 'en'
+                               ? [
+                                   BoxShadow(
+-                                    color: const Color(0xFF1E5620)
++                                    color: AppColors.primary
+                                         .withOpacity(0.08),
+                                     blurRadius: 10,
+                                     offset: const Offset(0, 4),
+@@ -284,7 +285,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                               style: TextStyle(
+                                 fontSize: 18,
+                                 fontWeight: FontWeight.bold,
+-                                color: Color(0xFF111827),
++                                color: AppColors.textPrimary,
+                               ),
+                             ),
+                           ],
+@@ -301,7 +302,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                 textAlign: TextAlign.center,
+                 style: TextStyle(
+                   fontSize: 14,
+-                  color: Color(0xFF6B7280),
++                  color: AppColors.textTertiary,
+                 ),
+               ),
+               const SizedBox(height: 20),
+@@ -311,7 +312,7 @@ class _OnboardingLanguagePageState extends State<OnboardingLanguagePage> {
+                 height: 54,
+                 child: ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+-                    backgroundColor: const Color(0xFF1E5620),
++                    backgroundColor: AppColors.primary,
+                     foregroundColor: Colors.white,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12),
+diff --git a/lib/screens/onboarding/onboarding_name_page.dart b/lib/screens/onboarding/onboarding_name_page.dart
+index 246e833..7ee26ff 100644
+--- a/lib/screens/onboarding/onboarding_name_page.dart
++++ b/lib/screens/onboarding/onboarding_name_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'onboarding_farm_page.dart';
+ 
+ class OnboardingNamePage extends StatefulWidget {
+@@ -35,7 +36,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+               width: 44,
+               height: 44,
+               decoration: const BoxDecoration(
+-                color: Color(0xFFF59E0B),
++                color: AppColors.amber,
+                 shape: BoxShape.circle,
+               ),
+               child: const Icon(
+@@ -60,7 +61,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFF59E0B),
++                        color: AppColors.amber,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -70,7 +71,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFE5E7EB),
++                        color: AppColors.border,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -80,7 +81,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                     child: Container(
+                       height: 8,
+                       decoration: BoxDecoration(
+-                        color: const Color(0xFFE5E7EB),
++                        color: AppColors.border,
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                     ),
+@@ -94,7 +95,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 'What is your name?',
+                 style: theme.textTheme.headlineMedium?.copyWith(
+                   fontWeight: FontWeight.bold,
+-                  color: const Color(0xFF111827),
++                  color: AppColors.textPrimary,
+                 ),
+               ),
+               const SizedBox(height: 12),
+@@ -103,7 +104,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 'We use this to personalize your agricultural reports and community interactions.',
+                 style: TextStyle(
+                   fontSize: 16,
+-                  color: Color(0xFF4B5563),
++                  color: AppColors.textSecondary,
+                   height: 1.4,
+                 ),
+               ),
+@@ -115,7 +116,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 style: TextStyle(
+                   fontSize: 14,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF374151),
++                  color: AppColors.textStrong,
+                 ),
+               ),
+               const SizedBox(height: 8),
+@@ -124,7 +125,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 controller: _nameController,
+                 decoration: InputDecoration(
+                   hintText: 'Enter your name here',
+-                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
++                  hintStyle: const TextStyle(color: AppColors.textMuted),
+                   fillColor: Colors.white,
+                   contentPadding: const EdgeInsets.symmetric(
+                     horizontal: 16,
+@@ -140,7 +141,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 decoration: BoxDecoration(
+                   color: const Color(0xFFF3F4F6),
+                   borderRadius: BorderRadius.circular(16),
+-                  border: Border.all(color: const Color(0xFFE5E7EB)),
++                  border: Border.all(color: AppColors.border),
+                 ),
+                 child: Row(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+@@ -148,7 +149,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                     Container(
+                       padding: const EdgeInsets.all(10),
+                       decoration: const BoxDecoration(
+-                        color: Color(0xFF1E5620),
++                        color: AppColors.primary,
+                         shape: BoxShape.circle,
+                       ),
+                       child: const Icon(
+@@ -164,7 +165,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                         style: TextStyle(
+                           fontSize: 14,
+                           fontStyle: FontStyle.italic,
+-                          color: Color(0xFF374151),
++                          color: AppColors.textStrong,
+                           height: 1.4,
+                         ),
+                       ),
+@@ -180,7 +181,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 height: 54,
+                 child: ElevatedButton(
+                   style: ElevatedButton.styleFrom(
+-                    backgroundColor: const Color(0xFF1E5620),
++                    backgroundColor: AppColors.primary,
+                     foregroundColor: Colors.white,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12),
+@@ -218,7 +219,7 @@ class _OnboardingNamePageState extends State<OnboardingNamePage> {
+                 style: TextStyle(
+                   fontSize: 14,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF6B7280),
++                  color: AppColors.textTertiary,
+                 ),
+               ),
+               const SizedBox(height: 8),
+diff --git a/lib/screens/onboarding/onboarding_page.dart b/lib/screens/onboarding/onboarding_page.dart
+index 9ef6f2f..30ddb74 100644
+--- a/lib/screens/onboarding/onboarding_page.dart
++++ b/lib/screens/onboarding/onboarding_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
+ import '../../features/settings_profile/presentation/cubit/settings_cubit.dart';
+@@ -58,7 +59,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             Expanded(child: Text(message)),
+           ],
+         ),
+-        backgroundColor: const Color(0xFF1E5631),
++        backgroundColor: AppColors.primary,
+         duration: const Duration(seconds: 3),
+       ),
+     );
+@@ -92,7 +93,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             LinearProgressIndicator(
+               value: (_currentStep + 1) / 3,
+               backgroundColor: Colors.grey.shade300,
+-              color: const Color(0xFF1E5631),
++              color: AppColors.primary,
+               minHeight: 6,
+             ),
+             Expanded(
+@@ -116,7 +117,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+                         },
+                         style: OutlinedButton.styleFrom(
+                           padding: const EdgeInsets.symmetric(vertical: 14),
+-                          side: const BorderSide(color: Color(0xFF1E5631)),
++                          side: const BorderSide(color: AppColors.primary),
+                         ),
+                         child: const Text('Back'),
+                       ),
+@@ -153,14 +154,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
+     return Column(
+       crossAxisAlignment: CrossAxisAlignment.stretch,
+       children: [
+-        const Icon(Icons.language_rounded, size: 56, color: Color(0xFF1E5631)),
++        const Icon(Icons.language_rounded, size: 56, color: AppColors.primary),
+         const SizedBox(height: 16),
+         Text(
+           'Hitamo Ururimi / Select Language',
+           textAlign: TextAlign.center,
+           style: theme.textTheme.headlineSmall?.copyWith(
+             fontWeight: FontWeight.bold,
+-            color: const Color(0xFF1E5631),
++            color: AppColors.primary,
+           ),
+         ),
+         const SizedBox(height: 8),
+@@ -176,9 +177,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
+           child: Container(
+             padding: const EdgeInsets.all(16),
+             decoration: BoxDecoration(
+-              color: const Color(0xFF4C9A2A).withValues(alpha: 0.12),
++              color: AppColors.primary.withValues(alpha: 0.12),
+               borderRadius: BorderRadius.circular(16),
+-              border: Border.all(color: const Color(0xFF4C9A2A)),
++              border: Border.all(color: AppColors.primary),
+             ),
+             child: Row(
+               children: [
+@@ -186,7 +187,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+                   _isPlayingAudio
+                       ? Icons.graphic_eq_rounded
+                       : Icons.volume_up_rounded,
+-                  color: const Color(0xFF1E5631),
++                  color: AppColors.primary,
+                   size: 32,
+                 ),
+                 const SizedBox(width: 12),
+@@ -198,7 +199,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+                         'Kanda hano wumve mu Kinyarwanda',
+                         style: TextStyle(
+                           fontWeight: FontWeight.bold,
+-                          color: Color(0xFF1E5631),
++                          color: AppColors.primary,
+                         ),
+                       ),
+                       Text(
+@@ -219,7 +220,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             borderRadius: BorderRadius.circular(16),
+             side: BorderSide(
+               color: _selectedLanguage == 'rw'
+-                  ? const Color(0xFF1E5631)
++                  ? AppColors.primary
+                   : Colors.transparent,
+               width: 2,
+             ),
+@@ -230,7 +231,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+               style: TextStyle(fontWeight: FontWeight.bold),
+             ),
+             trailing: _selectedLanguage == 'rw'
+-                ? const Icon(Icons.check_circle, color: Color(0xFF1E5631))
++                ? const Icon(Icons.check_circle, color: AppColors.primary)
+                 : null,
+             onTap: () {
+               setState(() {
+@@ -247,7 +248,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             borderRadius: BorderRadius.circular(16),
+             side: BorderSide(
+               color: _selectedLanguage == 'en'
+-                  ? const Color(0xFF1E5631)
++                  ? AppColors.primary
+                   : Colors.transparent,
+               width: 2,
+             ),
+@@ -258,7 +259,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+               style: TextStyle(fontWeight: FontWeight.bold),
+             ),
+             trailing: _selectedLanguage == 'en'
+-                ? const Icon(Icons.check_circle, color: Color(0xFF1E5631))
++                ? const Icon(Icons.check_circle, color: AppColors.primary)
+                 : null,
+             onTap: () {
+               setState(() {
+@@ -281,7 +282,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+         const Icon(
+           Icons.location_on_outlined,
+           size: 56,
+-          color: Color(0xFF1E5631),
++          color: AppColors.primary,
+         ),
+         const SizedBox(height: 16),
+         Text(
+@@ -291,7 +292,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+           textAlign: TextAlign.center,
+           style: theme.textTheme.headlineSmall?.copyWith(
+             fontWeight: FontWeight.bold,
+-            color: const Color(0xFF1E5631),
++            color: AppColors.primary,
+           ),
+         ),
+         const SizedBox(height: 8),
+@@ -304,12 +305,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
+         Container(
+           padding: const EdgeInsets.all(16),
+           decoration: BoxDecoration(
+-            color: const Color(0xFF1E5631).withValues(alpha: 0.08),
++            color: AppColors.primary.withValues(alpha: 0.08),
+             borderRadius: BorderRadius.circular(12),
+           ),
+           child: const Row(
+             children: [
+-              Icon(Icons.gps_fixed_rounded, color: Color(0xFF1E5631)),
++              Icon(Icons.gps_fixed_rounded, color: AppColors.primary),
+               SizedBox(width: 12),
+               Expanded(
+                 child: Text(
+@@ -347,14 +348,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
+     return Column(
+       crossAxisAlignment: CrossAxisAlignment.stretch,
+       children: [
+-        const Icon(Icons.eco_outlined, size: 56, color: Color(0xFF1E5631)),
++        const Icon(Icons.eco_outlined, size: 56, color: AppColors.primary),
+         const SizedBox(height: 16),
+         Text(
+           'Select Main Crops',
+           textAlign: TextAlign.center,
+           style: theme.textTheme.headlineSmall?.copyWith(
+             fontWeight: FontWeight.bold,
+-            color: const Color(0xFF1E5631),
++            color: AppColors.primary,
+           ),
+         ),
+         const SizedBox(height: 8),
+@@ -372,7 +373,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
+             return FilterChip(
+               label: Text(crop),
+               selected: isSelected,
+-              selectedColor: const Color(0xFF1E5631),
++              selectedColor: AppColors.primary,
+               checkmarkColor: Colors.white,
+               labelStyle: TextStyle(
+                 color: isSelected ? Colors.white : Colors.black87,
+diff --git a/lib/screens/safety_misinformation/check_advice_page.dart b/lib/screens/safety_misinformation/check_advice_page.dart
+index c1ef293..8c57ea2 100644
+--- a/lib/screens/safety_misinformation/check_advice_page.dart
++++ b/lib/screens/safety_misinformation/check_advice_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ 
+ class CheckAdvicePage extends StatefulWidget {
+   const CheckAdvicePage({super.key});
+@@ -47,7 +48,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               width: 44,
+               height: 44,
+               decoration: const BoxDecoration(
+-                color: Color(0xFFF59E0B),
++                color: AppColors.amber,
+                 shape: BoxShape.circle,
+               ),
+               child: const Icon(
+@@ -68,7 +69,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               'Combat misinformation in our community. Enter any farming techniques or advice you\'ve heard to verify its safety and scientific backing.',
+               style: TextStyle(
+                 fontSize: 15,
+-                color: Color(0xFF4B5563),
++                color: AppColors.textSecondary,
+                 height: 1.4,
+               ),
+             ),
+@@ -79,7 +80,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               style: TextStyle(
+                 fontSize: 16,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 8),
+@@ -88,7 +89,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(16),
+-                border: Border.all(color: const Color(0xFFE5E7EB)),
++                border: Border.all(color: AppColors.border),
+               ),
+               child: TextField(
+                 controller: _adviceController,
+@@ -96,7 +97,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+                 decoration: const InputDecoration(
+                   hintText:
+                       'Paste or type the farming advice you want to check.',
+-                  hintStyle: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
++                  hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
+                   border: InputBorder.none,
+                   contentPadding: EdgeInsets.all(16),
+                 ),
+@@ -109,7 +110,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               height: 52,
+               child: ElevatedButton.icon(
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFF1E5620),
++                  backgroundColor: AppColors.primary,
+                   foregroundColor: Colors.white,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(14),
+@@ -132,11 +133,11 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               const Center(
+                 child: Column(
+                   children: [
+-                    CircularProgressIndicator(color: Color(0xFF1E5620)),
++                    CircularProgressIndicator(color: AppColors.primary),
+                     SizedBox(height: 12),
+                     Text(
+                       'Checking MINAGRI & RAB database...',
+-                      style: TextStyle(color: Color(0xFF4B5563)),
++                      style: TextStyle(color: AppColors.textSecondary),
+                     ),
+                   ],
+                 ),
+@@ -146,9 +147,9 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+               Container(
+                 padding: const EdgeInsets.all(20),
+                 decoration: BoxDecoration(
+-                  color: const Color(0xFFF3F9F3),
++                  color: AppColors.primarySurface,
+                   borderRadius: BorderRadius.circular(20),
+-                  border: Border.all(color: const Color(0xFF1E5620), width: 1.5),
++                  border: Border.all(color: AppColors.primary, width: 1.5),
+                 ),
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+@@ -157,7 +158,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+                       children: [
+                         Icon(
+                           Icons.check_circle_rounded,
+-                          color: Color(0xFF1E5620),
++                          color: AppColors.primary,
+                           size: 28,
+                         ),
+                         SizedBox(width: 10),
+@@ -166,7 +167,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+                           style: TextStyle(
+                             fontSize: 18,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF1E5620),
++                            color: AppColors.primary,
+                           ),
+                         ),
+                       ],
+@@ -176,7 +177,7 @@ class _CheckAdvicePageState extends State<CheckAdvicePage> {
+                       _verificationResult!,
+                       style: const TextStyle(
+                         fontSize: 14,
+-                        color: Color(0xFF374151),
++                        color: AppColors.textStrong,
+                         height: 1.45,
+                       ),
+                     ),
+diff --git a/lib/screens/safety_misinformation/safety_scam_page.dart b/lib/screens/safety_misinformation/safety_scam_page.dart
+index 40f8d35..0aa57a5 100644
+--- a/lib/screens/safety_misinformation/safety_scam_page.dart
++++ b/lib/screens/safety_misinformation/safety_scam_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../features/settings_profile/presentation/cubit/settings_cubit.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+@@ -43,11 +44,11 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                 decoration: BoxDecoration(
+                   color: Colors.white,
+                   shape: BoxShape.circle,
+-                  border: Border.all(color: const Color(0xFFE5E7EB)),
++                  border: Border.all(color: AppColors.border),
+                 ),
+                 child: const Icon(
+                   Icons.volume_up_rounded,
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   size: 22,
+                 ),
+               ),
+@@ -61,7 +62,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+           Container(
+             width: double.infinity,
+             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+-            color: const Color(0xFFDC2626),
++            color: AppColors.error,
+             child: Row(
+               children: [
+                 const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 22),
+@@ -92,7 +93,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                     decoration: BoxDecoration(
+                       color: Colors.white,
+                       borderRadius: BorderRadius.circular(20),
+-                      border: Border.all(color: const Color(0xFFE5E7EB)),
++                      border: Border.all(color: AppColors.border),
+                     ),
+                     child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+@@ -106,13 +107,13 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                                 vertical: 6,
+                               ),
+                               decoration: BoxDecoration(
+-                                color: const Color(0xFFFEE2E2),
++                                color: AppColors.errorSurface,
+                                 borderRadius: BorderRadius.circular(12),
+                               ),
+                               child: const Text(
+                                 'URGENT WARNING',
+                                 style: TextStyle(
+-                                  color: Color(0xFFDC2626),
++                                  color: AppColors.error,
+                                   fontSize: 11,
+                                   fontWeight: FontWeight.bold,
+                                   letterSpacing: 0.5,
+@@ -122,7 +123,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                             const Text(
+                               'Jan 24, 2024',
+                               style: TextStyle(
+-                                color: Color(0xFF6B7280),
++                                color: AppColors.textTertiary,
+                                 fontSize: 13,
+                               ),
+                             ),
+@@ -135,7 +136,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                           style: TextStyle(
+                             fontSize: 24,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF111827),
++                            color: AppColors.textPrimary,
+                             height: 1.2,
+                           ),
+                         ),
+@@ -144,7 +145,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                           'Reports indicate counterfeit bags of "Ganza-Growth" are being sold at local markets in Musanze. The fake product contains mostly sand and harmful chemicals that will destroy your soil quality.',
+                           style: TextStyle(
+                             fontSize: 14,
+-                            color: Color(0xFF4B5563),
++                            color: AppColors.textSecondary,
+                             height: 1.4,
+                           ),
+                         ),
+@@ -157,7 +158,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                             color: Colors.white,
+                             borderRadius: BorderRadius.circular(16),
+                             border: Border.all(
+-                              color: const Color(0xFF1E5620),
++                              color: AppColors.primary,
+                               width: 1.5,
+                             ),
+                           ),
+@@ -168,7 +169,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                                 children: [
+                                   Icon(
+                                     Icons.search_rounded,
+-                                    color: Color(0xFF1E5620),
++                                    color: AppColors.primary,
+                                     size: 20,
+                                   ),
+                                   SizedBox(width: 8),
+@@ -177,17 +178,17 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                                     style: TextStyle(
+                                       fontSize: 15,
+                                       fontWeight: FontWeight.bold,
+-                                      color: Color(0xFF1E5620),
++                                      color: AppColors.primary,
+                                     ),
+                                   ),
+                                 ],
+                               ),
+                               SizedBox(height: 10),
+-                              Text('• Incorrect logo color (Blue instead of Green)', style: TextStyle(fontSize: 13, color: Color(0xFF374151))),
++                              Text('• Incorrect logo color (Blue instead of Green)', style: TextStyle(fontSize: 13, color: AppColors.textStrong)),
+                               SizedBox(height: 4),
+-                              Text('• No official certification stamp', style: TextStyle(fontSize: 13, color: Color(0xFF374151))),
++                              Text('• No official certification stamp', style: TextStyle(fontSize: 13, color: AppColors.textStrong)),
+                               SizedBox(height: 4),
+-                              Text('• Price is 40% lower than standard', style: TextStyle(fontSize: 13, color: Color(0xFF374151))),
++                              Text('• Price is 40% lower than standard', style: TextStyle(fontSize: 13, color: AppColors.textStrong)),
+                             ],
+                           ),
+                         ),
+@@ -197,7 +198,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                         Container(
+                           padding: const EdgeInsets.all(16),
+                           decoration: BoxDecoration(
+-                            color: const Color(0xFFFEE2E2),
++                            color: AppColors.errorSurface,
+                             borderRadius: BorderRadius.circular(16),
+                           ),
+                           child: const Row(
+@@ -205,7 +206,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                             children: [
+                               Icon(
+                                 Icons.cleaning_services_outlined,
+-                                color: Color(0xFF991B1B),
++                                color: AppColors.errorDark,
+                                 size: 20,
+                               ),
+                               SizedBox(width: 12),
+@@ -218,7 +219,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                                       style: TextStyle(
+                                         fontSize: 14,
+                                         fontWeight: FontWeight.bold,
+-                                        color: Color(0xFF991B1B),
++                                        color: AppColors.errorDark,
+                                       ),
+                                     ),
+                                     SizedBox(height: 4),
+@@ -268,14 +269,14 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                         style: TextStyle(
+                           fontSize: 20,
+                           fontWeight: FontWeight.bold,
+-                          color: Color(0xFF111827),
++                          color: AppColors.textPrimary,
+                         ),
+                       ),
+                       Text(
+                         'View All',
+                         style: TextStyle(
+                           fontSize: 13,
+-                          color: Color(0xFF6B7280),
++                          color: AppColors.textTertiary,
+                         ),
+                       ),
+                     ],
+@@ -295,7 +296,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                     height: 54,
+                     child: ElevatedButton.icon(
+                       style: ElevatedButton.styleFrom(
+-                        backgroundColor: const Color(0xFFF59E0B),
++                        backgroundColor: AppColors.amber,
+                         foregroundColor: Colors.black87,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(14),
+@@ -334,7 +335,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(16),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Row(
+         children: [
+@@ -342,7 +343,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+             width: 44,
+             height: 44,
+             decoration: const BoxDecoration(
+-              color: Color(0xFFF59E0B),
++              color: AppColors.amber,
+               shape: BoxShape.circle,
+             ),
+             child: const Icon(
+@@ -364,14 +365,14 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                       style: const TextStyle(
+                         fontSize: 15,
+                         fontWeight: FontWeight.bold,
+-                        color: Color(0xFF111827),
++                        color: AppColors.textPrimary,
+                       ),
+                     ),
+                     Text(
+                       date,
+                       style: const TextStyle(
+                         fontSize: 11,
+-                        color: Color(0xFF9CA3AF),
++                        color: AppColors.textMuted,
+                       ),
+                     ),
+                   ],
+@@ -381,7 +382,7 @@ class _SafetyScamPageState extends State<SafetyScamPage> {
+                   subtitle,
+                   style: const TextStyle(
+                     fontSize: 13,
+-                    color: Color(0xFF6B7280),
++                    color: AppColors.textTertiary,
+                   ),
+                 ),
+               ],
+diff --git a/lib/screens/settings_profile/accessibility_settings_page.dart b/lib/screens/settings_profile/accessibility_settings_page.dart
+index d60d389..6105990 100644
+--- a/lib/screens/settings_profile/accessibility_settings_page.dart
++++ b/lib/screens/settings_profile/accessibility_settings_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../features/auth/presentation/bloc/auth_bloc.dart';
+ import '../../features/auth/presentation/bloc/auth_event.dart';
+@@ -29,10 +30,13 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+ 
+     return Scaffold(
+       appBar: AppBar(
+-        leading: IconButton(
+-          icon: const Icon(Icons.arrow_back_rounded),
+-          onPressed: () => Navigator.maybePop(context),
+-        ),
++        // Only show a back arrow when this screen was pushed (not as a tab).
++        leading: Navigator.canPop(context)
++            ? IconButton(
++                icon: const Icon(Icons.arrow_back_rounded),
++                onPressed: () => Navigator.maybePop(context),
++              )
++            : null,
+         title: Text(isRw ? 'Igenamiterere' : 'Accessibility Settings'),
+         actions: [
+           Padding(
+@@ -41,7 +45,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+               width: 44,
+               height: 44,
+               decoration: const BoxDecoration(
+-                color: Color(0xFF1E5620),
++                color: AppColors.primary,
+                 shape: BoxShape.circle,
+               ),
+               child: const Icon(
+@@ -113,7 +117,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+               style: const TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 14),
+@@ -154,7 +158,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+               height: 52,
+               child: ElevatedButton.icon(
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFF1E5620),
++                  backgroundColor: AppColors.primary,
+                   foregroundColor: Colors.white,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(14),
+@@ -185,7 +189,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+               height: 52,
+               child: ElevatedButton.icon(
+                 style: ElevatedButton.styleFrom(
+-                  backgroundColor: const Color(0xFFDC2626),
++                  backgroundColor: AppColors.error,
+                   foregroundColor: Colors.white,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(14),
+@@ -227,17 +231,17 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(20),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Row(
+         children: [
+           Container(
+             padding: const EdgeInsets.all(12),
+             decoration: BoxDecoration(
+-              color: const Color(0xFF1E5620).withOpacity(0.1),
++              color: AppColors.primary.withOpacity(0.1),
+               borderRadius: BorderRadius.circular(14),
+             ),
+-            child: Icon(icon, color: const Color(0xFF1E5620), size: 26),
++            child: Icon(icon, color: AppColors.primary, size: 26),
+           ),
+           const SizedBox(width: 14),
+           Expanded(
+@@ -249,7 +253,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+                   style: const TextStyle(
+                     fontSize: 16,
+                     fontWeight: FontWeight.bold,
+-                    color: Color(0xFF111827),
++                    color: AppColors.textPrimary,
+                   ),
+                 ),
+                 const SizedBox(height: 2),
+@@ -257,7 +261,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+                   subtitle,
+                   style: const TextStyle(
+                     fontSize: 13,
+-                    color: Color(0xFF6B7280),
++                    color: AppColors.textTertiary,
+                     height: 1.3,
+                   ),
+                 ),
+@@ -266,7 +270,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+           ),
+           Switch(
+             value: value,
+-            activeColor: const Color(0xFF1E5620),
++            activeColor: AppColors.primary,
+             onChanged: onChanged,
+           ),
+         ],
+@@ -286,12 +290,12 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+       child: Container(
+         padding: const EdgeInsets.all(16),
+         decoration: BoxDecoration(
+-          color: isSelected ? const Color(0xFFF3F9F3) : Colors.white,
++          color: isSelected ? AppColors.primarySurface : Colors.white,
+           borderRadius: BorderRadius.circular(16),
+           border: Border.all(
+             color: isSelected
+-                ? const Color(0xFF1E5620)
+-                : const Color(0xFFE5E7EB),
++                ? AppColors.primary
++                : AppColors.border,
+             width: isSelected ? 1.5 : 1,
+           ),
+         ),
+@@ -308,14 +312,14 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+                     style: const TextStyle(
+                       fontSize: 16,
+                       fontWeight: FontWeight.bold,
+-                      color: Color(0xFF111827),
++                      color: AppColors.textPrimary,
+                     ),
+                   ),
+                   Text(
+                     subtitle,
+                     style: const TextStyle(
+                       fontSize: 13,
+-                      color: Color(0xFF6B7280),
++                      color: AppColors.textTertiary,
+                     ),
+                   ),
+                 ],
+@@ -325,7 +329,7 @@ class _AccessibilitySettingsPageState extends State<AccessibilitySettingsPage> {
+               Container(
+                 padding: const EdgeInsets.all(4),
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+diff --git a/lib/screens/settings_profile/settings_profile_page.dart b/lib/screens/settings_profile/settings_profile_page.dart
+index 41b811f..d25e74a 100644
+--- a/lib/screens/settings_profile/settings_profile_page.dart
++++ b/lib/screens/settings_profile/settings_profile_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import '../../../core/utils/i18n_strings.dart';
+ import '../../features/auth/domain/entities/user_entity.dart';
+@@ -77,14 +78,14 @@ class SettingsProfilePage extends StatelessWidget {
+                         Chip(
+                           visualDensity: VisualDensity.compact,
+                           backgroundColor: const Color(
+-                            0xFF1E5631,
++                            0xFF1E5620,
+                           ).withValues(alpha: 0.1),
+                           label: Text(
+                             '${user.role} • ${user.farmLocation}',
+                             style: const TextStyle(
+                               fontSize: 11,
+                               fontWeight: FontWeight.bold,
+-                              color: Color(0xFF1E5631),
++                              color: AppColors.primary,
+                             ),
+                           ),
+                         ),
+@@ -172,7 +173,7 @@ class SettingsProfilePage extends StatelessWidget {
+                     trailing: settings.themeMode == 'light'
+                         ? const Icon(
+                             Icons.check_circle,
+-                            color: Color(0xFF1E5631),
++                            color: AppColors.primary,
+                           )
+                         : null,
+                     onTap: () => settingsCubit.setThemeMode('light'),
+@@ -184,7 +185,7 @@ class SettingsProfilePage extends StatelessWidget {
+                     trailing: settings.themeMode == 'dark'
+                         ? const Icon(
+                             Icons.check_circle,
+-                            color: Color(0xFF1E5631),
++                            color: AppColors.primary,
+                           )
+                         : null,
+                     onTap: () => settingsCubit.setThemeMode('dark'),
+@@ -196,7 +197,7 @@ class SettingsProfilePage extends StatelessWidget {
+                     trailing: settings.themeMode == 'system'
+                         ? const Icon(
+                             Icons.check_circle,
+-                            color: Color(0xFF1E5631),
++                            color: AppColors.primary,
+                           )
+                         : null,
+                     onTap: () => settingsCubit.setThemeMode('system'),
+diff --git a/lib/screens/weather_calendar/weather_calendar_page.dart b/lib/screens/weather_calendar/weather_calendar_page.dart
+index ca861ab..235f06a 100644
+--- a/lib/screens/weather_calendar/weather_calendar_page.dart
++++ b/lib/screens/weather_calendar/weather_calendar_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:intl/intl.dart';
+ import '../community_forum/my_cooperative_page.dart';
+ import '../main_navigation/voice_navigation_modal.dart';
+@@ -62,7 +63,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+     // Generate realistic status dot based on day pattern
+     if (day % 5 == 0) return Colors.red;
+     if (day % 3 == 0) return Colors.amber;
+-    return const Color(0xFF1E5620);
++    return AppColors.primary;
+   }
+ 
+   @override
+@@ -93,7 +94,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                 width: 44,
+                 height: 44,
+                 decoration: const BoxDecoration(
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(
+@@ -125,7 +126,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                       monthYearString,
+                       style: theme.textTheme.headlineSmall?.copyWith(
+                         fontWeight: FontWeight.bold,
+-                        color: const Color(0xFF111827),
++                        color: AppColors.textPrimary,
+                       ),
+                     ),
+                     const SizedBox(height: 2),
+@@ -133,7 +134,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                       'Live Calendar • ${DateFormat('d MMMM yyyy').format(_today)}',
+                       style: const TextStyle(
+                         fontSize: 12,
+-                        color: Color(0xFF1E5620),
++                        color: AppColors.primary,
+                         fontWeight: FontWeight.bold,
+                       ),
+                     ),
+@@ -153,7 +154,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(16),
+-                border: Border.all(color: const Color(0xFFE5E7EB)),
++                border: Border.all(color: AppColors.border),
+               ),
+               child: Column(
+                 children: [
+@@ -170,7 +171,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                       _DayHeader('S'),
+                     ],
+                   ),
+-                  const Divider(height: 24, color: Color(0xFFE5E7EB)),
++                  const Divider(height: 24, color: AppColors.border),
+                   // Dynamic Grid Rows
+                   ...monthGrid.map((row) {
+                     return Padding(
+@@ -191,10 +192,10 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                             width: 40,
+                             height: 48,
+                             decoration: BoxDecoration(
+-                              color: isToday ? const Color(0xFFF3F9F3) : Colors.transparent,
++                              color: isToday ? AppColors.primarySurface : Colors.transparent,
+                               borderRadius: BorderRadius.circular(8),
+                               border: Border.all(
+-                                color: isToday ? const Color(0xFF1E5620) : Colors.transparent,
++                                color: isToday ? AppColors.primary : Colors.transparent,
+                                 width: 1.8,
+                               ),
+                             ),
+@@ -207,8 +208,8 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                                     fontSize: 13,
+                                     fontWeight: FontWeight.bold,
+                                     color: isToday
+-                                        ? const Color(0xFF1E5620)
+-                                        : const Color(0xFF111827),
++                                        ? AppColors.primary
++                                        : AppColors.textPrimary,
+                                   ),
+                                 ),
+                                 if (isToday)
+@@ -217,7 +218,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                                     style: TextStyle(
+                                       fontSize: 7,
+                                       fontWeight: FontWeight.bold,
+-                                      color: Color(0xFF1E5620),
++                                      color: AppColors.primary,
+                                     ),
+                                   ),
+                                 const SizedBox(height: 2),
+@@ -247,31 +248,31 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+               style: TextStyle(
+                 fontSize: 20,
+                 fontWeight: FontWeight.bold,
+-                color: Color(0xFF111827),
++                color: AppColors.textPrimary,
+               ),
+             ),
+             const SizedBox(height: 12),
+ 
+             _buildLegendBox(
+-              color: const Color(0xFF1E5620),
++              color: AppColors.primary,
+               title: 'Ideal Planting',
+               subtitle: 'Perfect soil moisture & mild weather.',
+-              bgColor: const Color(0xFFF3F9F3),
+-              borderColor: const Color(0xFFC8E6C9),
++              bgColor: AppColors.primarySurface,
++              borderColor: AppColors.primaryLight,
+             ),
+             const SizedBox(height: 10),
+ 
+             _buildLegendBox(
+-              color: const Color(0xFFF59E0B),
++              color: AppColors.amber,
+               title: 'Caution',
+               subtitle: 'Moderate risk of light rain or dry wind.',
+-              bgColor: const Color(0xFFFFFBEB),
++              bgColor: AppColors.amberSurface,
+               borderColor: const Color(0xFFFDE68A),
+             ),
+             const SizedBox(height: 10),
+ 
+             _buildLegendBox(
+-              color: const Color(0xFFDC2626),
++              color: AppColors.error,
+               title: 'Avoid Planting',
+               subtitle: 'Heavy storms or extreme heat predicted.',
+               bgColor: const Color(0xFFFEF2F2),
+@@ -283,7 +284,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+             Container(
+               padding: const EdgeInsets.all(20),
+               decoration: BoxDecoration(
+-                color: const Color(0xFF1E5620),
++                color: AppColors.primary,
+                 borderRadius: BorderRadius.circular(20),
+               ),
+               child: Column(
+@@ -309,7 +310,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                   const SizedBox(height: 18),
+                   ElevatedButton(
+                     style: ElevatedButton.styleFrom(
+-                      backgroundColor: const Color(0xFFF59E0B),
++                      backgroundColor: AppColors.amber,
+                       foregroundColor: Colors.black87,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(12),
+@@ -379,7 +380,7 @@ class _WeatherCalendarPageState extends State<WeatherCalendarPage> {
+                   subtitle,
+                   style: const TextStyle(
+                     fontSize: 13,
+-                    color: Color(0xFF4B5563),
++                    color: AppColors.textSecondary,
+                   ),
+                 ),
+               ],
+@@ -404,7 +405,7 @@ class _DayHeader extends StatelessWidget {
+         textAlign: TextAlign.center,
+         style: const TextStyle(
+           fontWeight: FontWeight.bold,
+-          color: Color(0xFF6B7280),
++          color: AppColors.textTertiary,
+         ),
+       ),
+     );
+diff --git a/lib/screens/weather_calendar/weather_forecast_detail_page.dart b/lib/screens/weather_calendar/weather_forecast_detail_page.dart
+index 9224c89..5f16027 100644
+--- a/lib/screens/weather_calendar/weather_forecast_detail_page.dart
++++ b/lib/screens/weather_calendar/weather_forecast_detail_page.dart
+@@ -1,4 +1,5 @@
+ import 'package:flutter/material.dart';
++import 'package:agrosafe/core/theme/app_colors.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+ import 'package:intl/intl.dart';
+ import '../../../core/services/audio_service.dart';
+@@ -65,7 +66,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                 style: const TextStyle(
+                   fontSize: 20,
+                   fontWeight: FontWeight.bold,
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                 ),
+               ),
+               const SizedBox(height: 12),
+@@ -74,17 +75,17 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                 return ListTile(
+                   leading: Icon(
+                     Icons.location_on_rounded,
+-                    color: isSelected ? const Color(0xFF1E5620) : Colors.grey,
++                    color: isSelected ? AppColors.primary : Colors.grey,
+                   ),
+                   title: Text(
+                     item['district']!,
+                     style: TextStyle(
+                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+-                      color: isSelected ? const Color(0xFF1E5620) : Colors.black87,
++                      color: isSelected ? AppColors.primary : Colors.black87,
+                     ),
+                   ),
+                   subtitle: Text(item['province']!),
+-                  trailing: isSelected ? const Icon(Icons.check_circle, color: Color(0xFF1E5620)) : null,
++                  trailing: isSelected ? const Icon(Icons.check_circle, color: AppColors.primary) : null,
+                   onTap: () {
+                     setState(() {
+                       _selectedDistrict = item['district']!;
+@@ -118,10 +119,15 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+ 
+     return Scaffold(
+       appBar: AppBar(
+-        leading: IconButton(
+-          icon: const Icon(Icons.arrow_back_rounded),
+-          onPressed: () => Navigator.maybePop(context),
+-        ),
++        // Only show a back arrow when this screen was pushed onto the stack.
++        // As a bottom-nav tab it is the root of the stack, so a back button
++        // would have nothing to pop (this is why it appeared "dead").
++        leading: Navigator.canPop(context)
++            ? IconButton(
++                icon: const Icon(Icons.arrow_back_rounded),
++                onPressed: () => Navigator.maybePop(context),
++              )
++            : null,
+         title: Text(isRw ? 'Ikirere' : 'Weather'),
+         actions: [
+           Padding(
+@@ -140,11 +146,11 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                 decoration: BoxDecoration(
+                   color: Colors.white,
+                   shape: BoxShape.circle,
+-                  border: Border.all(color: const Color(0xFFE5E7EB)),
++                  border: Border.all(color: AppColors.border),
+                 ),
+                 child: const Icon(
+                   Icons.volume_up_rounded,
+-                  color: Color(0xFF1E5620),
++                  color: AppColors.primary,
+                   size: 22,
+                 ),
+               ),
+@@ -165,7 +171,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                 decoration: BoxDecoration(
+                   color: Colors.white,
+                   borderRadius: BorderRadius.circular(20),
+-                  border: Border.all(color: const Color(0xFFE5E7EB)),
++                  border: Border.all(color: AppColors.border),
+                   boxShadow: [
+                     BoxShadow(
+                       color: Colors.black.withValues(alpha: 0.04),
+@@ -185,7 +191,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                               const Icon(
+                                 Icons.my_location_rounded,
+                                 size: 16,
+-                                color: Color(0xFF1E5620),
++                                color: AppColors.primary,
+                               ),
+                               const SizedBox(width: 6),
+                               Text(
+@@ -193,7 +199,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                                 style: const TextStyle(
+                                   fontSize: 11,
+                                   fontWeight: FontWeight.bold,
+-                                  color: Color(0xFF1E5620),
++                                  color: AppColors.primary,
+                                   letterSpacing: 1.0,
+                                 ),
+                               ),
+@@ -201,7 +207,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                               Container(
+                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                 decoration: BoxDecoration(
+-                                  color: const Color(0xFFDCFCE7),
++                                  color: AppColors.primarySurface,
+                                   borderRadius: BorderRadius.circular(6),
+                                 ),
+                                 child: const Text(
+@@ -209,7 +215,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                                   style: TextStyle(
+                                     fontSize: 9,
+                                     fontWeight: FontWeight.bold,
+-                                    color: Color(0xFF15803D),
++                                    color: AppColors.primary,
+                                   ),
+                                 ),
+                               ),
+@@ -223,11 +229,11 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                                 style: const TextStyle(
+                                   fontSize: 24,
+                                   fontWeight: FontWeight.bold,
+-                                  color: Color(0xFF111827),
++                                  color: AppColors.textPrimary,
+                                 ),
+                               ),
+                               const SizedBox(width: 6),
+-                              const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF1E5620)),
++                              const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+                             ],
+                           ),
+                           const SizedBox(height: 2),
+@@ -235,7 +241,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                             _selectedProvince,
+                             style: const TextStyle(
+                               fontSize: 14,
+-                              color: Color(0xFF6B7280),
++                              color: AppColors.textTertiary,
+                             ),
+                           ),
+                         ],
+@@ -254,7 +260,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                         width: 52,
+                         height: 52,
+                         decoration: const BoxDecoration(
+-                          color: Color(0xFFF59E0B),
++                          color: AppColors.amber,
+                           shape: BoxShape.circle,
+                         ),
+                         child: const Icon(
+@@ -274,7 +280,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+             Container(
+               padding: const EdgeInsets.all(24),
+               decoration: BoxDecoration(
+-                color: const Color(0xFF1E5620),
++                color: AppColors.primary,
+                 borderRadius: BorderRadius.circular(24),
+               ),
+               child: Column(
+@@ -310,7 +316,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                   const Icon(
+                     Icons.wb_sunny_outlined,
+                     size: 72,
+-                    color: Color(0xFFF59E0B),
++                    color: AppColors.amber,
+                   ),
+                   const SizedBox(height: 28),
+                   Row(
+@@ -335,14 +341,14 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                   style: const TextStyle(
+                     fontSize: 20,
+                     fontWeight: FontWeight.bold,
+-                    color: Color(0xFF111827),
++                    color: AppColors.textPrimary,
+                   ),
+                 ),
+                 Text(
+                   isRw ? 'Kanda ubugaraguze' : 'Slide for more',
+                   style: const TextStyle(
+                     fontSize: 13,
+-                    color: Color(0xFF6B7280),
++                    color: AppColors.textTertiary,
+                   ),
+                 ),
+               ],
+@@ -387,7 +393,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+             Container(
+               padding: const EdgeInsets.all(20),
+               decoration: BoxDecoration(
+-                color: const Color(0xFFF59E0B),
++                color: AppColors.amber,
+                 borderRadius: BorderRadius.circular(20),
+               ),
+               child: Column(
+@@ -398,7 +404,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                       Container(
+                         padding: const EdgeInsets.all(10),
+                         decoration: const BoxDecoration(
+-                          color: Color(0xFF78350F),
++                          color: AppColors.onAmber,
+                           shape: BoxShape.circle,
+                         ),
+                         child: const Icon(
+@@ -416,7 +422,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                           style: const TextStyle(
+                             fontSize: 20,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF78350F),
++                            color: AppColors.onAmber,
+                             height: 1.2,
+                           ),
+                         ),
+@@ -441,7 +447,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                           style: const TextStyle(
+                             fontSize: 15,
+                             fontWeight: FontWeight.bold,
+-                            color: Color(0xFF111827),
++                            color: AppColors.textPrimary,
+                           ),
+                         ),
+                         const SizedBox(height: 6),
+@@ -451,7 +457,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                               : 'Heavy rain expected Wednesday — wait before planting to prevent seed washout and soil erosion.',
+                           style: const TextStyle(
+                             fontSize: 14,
+-                            color: Color(0xFF4B5563),
++                            color: AppColors.textSecondary,
+                             height: 1.35,
+                           ),
+                         ),
+@@ -464,7 +470,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                     height: 48,
+                     child: ElevatedButton.icon(
+                       style: ElevatedButton.styleFrom(
+-                        backgroundColor: const Color(0xFF1E5620),
++                        backgroundColor: AppColors.primary,
+                         foregroundColor: Colors.white,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(12),
+@@ -497,7 +503,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+               title: 'Soil Moisture',
+               value: 'Optimum',
+               subtitle: 'Last updated 2 hours ago',
+-              valueColor: const Color(0xFF1E5620),
++              valueColor: AppColors.primary,
+             ),
+             const SizedBox(height: 14),
+ 
+@@ -507,7 +513,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+               title: 'Wind Speed',
+               value: 'Low',
+               subtitle: 'Safe for spraying fertilizers',
+-              valueColor: const Color(0xFF1E5620),
++              valueColor: AppColors.primary,
+             ),
+             const SizedBox(height: 16),
+           ],
+@@ -552,10 +558,10 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+       width: 100,
+       padding: const EdgeInsets.all(14),
+       decoration: BoxDecoration(
+-        color: isRainAlert ? const Color(0xFFFEE2E2) : Colors.white,
++        color: isRainAlert ? AppColors.errorSurface : Colors.white,
+         borderRadius: BorderRadius.circular(16),
+         border: Border.all(
+-          color: isRainAlert ? const Color(0xFFEF4444) : const Color(0xFFE5E7EB),
++          color: isRainAlert ? AppColors.error : AppColors.border,
+           width: isRainAlert ? 1.5 : 1,
+         ),
+       ),
+@@ -567,14 +573,14 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+             style: TextStyle(
+               fontSize: 15,
+               fontWeight: FontWeight.bold,
+-              color: isRainAlert ? const Color(0xFF991B1B) : const Color(0xFF111827),
++              color: isRainAlert ? AppColors.errorDark : AppColors.textPrimary,
+             ),
+           ),
+           const SizedBox(height: 10),
+           Icon(
+             icon,
+             size: 28,
+-            color: isRainAlert ? const Color(0xFFDC2626) : const Color(0xFF111827),
++            color: isRainAlert ? AppColors.error : AppColors.textPrimary,
+           ),
+           const SizedBox(height: 10),
+           Text(
+@@ -582,7 +588,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+             style: TextStyle(
+               fontSize: 14,
+               fontWeight: FontWeight.bold,
+-              color: isRainAlert ? const Color(0xFF991B1B) : const Color(0xFF111827),
++              color: isRainAlert ? AppColors.errorDark : AppColors.textPrimary,
+             ),
+           ),
+           Text(
+@@ -590,7 +596,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+             style: TextStyle(
+               fontSize: 12,
+               fontWeight: FontWeight.w600,
+-              color: isRainAlert ? const Color(0xFFDC2626) : const Color(0xFF6B7280),
++              color: isRainAlert ? AppColors.error : AppColors.textTertiary,
+             ),
+           ),
+         ],
+@@ -610,11 +616,11 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+       decoration: BoxDecoration(
+         color: Colors.white,
+         borderRadius: BorderRadius.circular(16),
+-        border: Border.all(color: const Color(0xFFE5E7EB)),
++        border: Border.all(color: AppColors.border),
+       ),
+       child: Row(
+         children: [
+-          Icon(icon, color: const Color(0xFF1E5620), size: 28),
++          Icon(icon, color: AppColors.primary, size: 28),
+           const SizedBox(width: 14),
+           Expanded(
+             child: Column(
+@@ -624,7 +630,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                   title,
+                   style: const TextStyle(
+                     fontSize: 13,
+-                    color: Color(0xFF6B7280),
++                    color: AppColors.textTertiary,
+                     fontWeight: FontWeight.w500,
+                   ),
+                 ),
+@@ -641,7 +647,7 @@ class _WeatherForecastDetailPageState extends State<WeatherForecastDetailPage> {
+                   subtitle,
+                   style: const TextStyle(
+                     fontSize: 12,
+-                    color: Color(0xFF9CA3AF),
++                    color: AppColors.textMuted,
+                   ),
+                 ),
+               ],

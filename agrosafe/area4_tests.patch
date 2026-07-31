@@ -1,0 +1,164 @@
+diff --git a/test/unit/auth_bloc_test.dart b/test/unit/auth_bloc_test.dart
+index f5d25c5..4069c0d 100644
+--- a/test/unit/auth_bloc_test.dart
++++ b/test/unit/auth_bloc_test.dart
+@@ -3,6 +3,7 @@ import 'package:agrosafe/features/auth/domain/entities/user_entity.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/get_current_user_usecase.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/login_usecase.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/register_usecase.dart';
++import 'package:agrosafe/features/auth/domain/usecases/reset_password_usecase.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/sign_out_usecase.dart';
+ import 'package:agrosafe/features/auth/presentation/bloc/auth_bloc.dart';
+ import 'package:agrosafe/features/auth/presentation/bloc/auth_event.dart';
+@@ -19,20 +20,26 @@ class MockSignOutUseCase extends Mock implements SignOutUseCase {}
+ 
+ class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
+ 
++class MockResetPasswordUseCase extends Mock implements ResetPasswordUseCase {}
++
+ class FakeLoginParams extends Fake implements LoginParams {}
+ 
+ class FakeNoParams extends Fake implements NoParams {}
+ 
++class FakeResetPasswordParams extends Fake implements ResetPasswordParams {}
++
+ void main() {
+   late AuthBloc bloc;
+   late MockLoginUseCase mockLoginUseCase;
+   late MockRegisterUseCase mockRegisterUseCase;
+   late MockSignOutUseCase mockSignOutUseCase;
+   late MockGetCurrentUserUseCase mockGetCurrentUserUseCase;
++  late MockResetPasswordUseCase mockResetPasswordUseCase;
+ 
+   setUpAll(() {
+     registerFallbackValue(FakeLoginParams());
+     registerFallbackValue(FakeNoParams());
++    registerFallbackValue(FakeResetPasswordParams());
+   });
+ 
+   setUp(() {
+@@ -40,12 +47,14 @@ void main() {
+     mockRegisterUseCase = MockRegisterUseCase();
+     mockSignOutUseCase = MockSignOutUseCase();
+     mockGetCurrentUserUseCase = MockGetCurrentUserUseCase();
++    mockResetPasswordUseCase = MockResetPasswordUseCase();
+ 
+     bloc = AuthBloc(
+       loginUseCase: mockLoginUseCase,
+       registerUseCase: mockRegisterUseCase,
+       signOutUseCase: mockSignOutUseCase,
+       getCurrentUserUseCase: mockGetCurrentUserUseCase,
++      resetPasswordUseCase: mockResetPasswordUseCase,
+     );
+   });
+ 
+@@ -99,4 +108,21 @@ void main() {
+       bloc.add(AuthSignOutSubmitted());
+     },
+   );
++
++  test(
++    'emits [AuthLoading, AuthPasswordResetSent] on successful reset request',
++    () async {
++      when(
++        () => mockResetPasswordUseCase(any()),
++      ).thenAnswer((_) async => const Right(null));
++
++      final expected = [isA<AuthLoading>(), isA<AuthPasswordResetSent>()];
++
++      expectLater(bloc.stream, emitsInOrder(expected));
++
++      bloc.add(
++        const AuthPasswordResetRequested(email: 'farmer@agrosafe.rw'),
++      );
++    },
++  );
+ }
+diff --git a/test/widget/login_page_test.dart b/test/widget/login_page_test.dart
+index 7041267..9619ea6 100644
+--- a/test/widget/login_page_test.dart
++++ b/test/widget/login_page_test.dart
+@@ -1,6 +1,7 @@
+ import 'package:agrosafe/features/auth/domain/usecases/get_current_user_usecase.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/login_usecase.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/register_usecase.dart';
++import 'package:agrosafe/features/auth/domain/usecases/reset_password_usecase.dart';
+ import 'package:agrosafe/features/auth/domain/usecases/sign_out_usecase.dart';
+ import 'package:agrosafe/features/auth/presentation/bloc/auth_bloc.dart';
+ import 'package:agrosafe/screens/auth/login_page.dart';
+@@ -19,6 +20,8 @@ class MockSignOutUseCase extends Mock implements SignOutUseCase {}
+ 
+ class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
+ 
++class MockResetPasswordUseCase extends Mock implements ResetPasswordUseCase {}
++
+ class MockSettingsLocalDataSource extends Mock
+     implements SettingsLocalDataSource {}
+ 
+@@ -33,6 +36,7 @@ void main() {
+       registerUseCase: MockRegisterUseCase(),
+       signOutUseCase: MockSignOutUseCase(),
+       getCurrentUserUseCase: MockGetCurrentUserUseCase(),
++      resetPasswordUseCase: MockResetPasswordUseCase(),
+     );
+ 
+     mockSettingsDataSource = MockSettingsLocalDataSource();
+diff --git a/test/widget_test.dart b/test/widget_test.dart
+index 92683dc..a98d4c7 100644
+--- a/test/widget_test.dart
++++ b/test/widget_test.dart
+@@ -1,7 +1,52 @@
++import 'package:agrosafe/features/crop_incident/data/models/incident_model.dart';
++import 'package:cloud_firestore/cloud_firestore.dart';
+ import 'package:flutter_test/flutter_test.dart';
+ 
++/// Unit tests for IncidentModel serialization — in particular that `reportedAt`
++/// is written as a Firestore Timestamp and read back losslessly (Area 3), while
++/// still tolerating legacy ISO-8601 string values.
+ void main() {
+-  test('AgroSafe test suite bootstrap', () {
+-    expect(1 + 1, equals(2));
++  final reportedAt = DateTime(2026, 1, 15, 9, 30);
++
++  IncidentModel buildModel() => IncidentModel(
++        id: 'inc_test',
++        userId: 'user_001',
++        cropName: 'Beans',
++        issueType: 'Fungal Blight',
++        severity: 'High',
++        location: 'Musanze District',
++        description: 'Yellowing leaves',
++        status: 'Reported',
++        reportedAt: reportedAt,
++      );
++
++  test('toMap stores reportedAt as a Firestore Timestamp', () {
++    final map = buildModel().toMap();
++    expect(map['reportedAt'], isA<Timestamp>());
++    expect((map['reportedAt'] as Timestamp).toDate(), reportedAt);
++    expect(map['userId'], 'user_001');
++  });
++
++  test('fromMap reads a Timestamp back into a DateTime', () {
++    final map = buildModel().toMap();
++    final restored = IncidentModel.fromMap(map, 'inc_test');
++    expect(restored.reportedAt, reportedAt);
++    expect(restored.cropName, 'Beans');
++    expect(restored.severity, 'High');
++  });
++
++  test('fromMap still tolerates a legacy ISO-8601 string reportedAt', () {
++    final legacy = {
++      'userId': 'user_001',
++      'cropName': 'Maize',
++      'issueType': 'Pest Attack',
++      'severity': 'Critical',
++      'location': 'Nyabihu',
++      'description': 'Armyworm',
++      'status': 'Reported',
++      'reportedAt': reportedAt.toIso8601String(),
++    };
++    final restored = IncidentModel.fromMap(legacy, 'inc_legacy');
++    expect(restored.reportedAt, reportedAt);
+   });
+ }

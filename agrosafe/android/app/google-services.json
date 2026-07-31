@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "445232998608",
+    "project_id": "agrosafe-47bb2",
+    "storage_bucket": "agrosafe-47bb2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445232998608:android:cb456f49a615e3a20a16d5",
+        "android_client_info": {
+          "package_name": "com.agrosafe.agrosafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAh2wxVgor_UDHaRiCezXWHLvCltRavlr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
