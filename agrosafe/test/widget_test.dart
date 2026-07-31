@@ -1,30 +1,52 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:agrosafe/features/crop_incident/data/models/incident_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:agrosafe/main.dart';
-
+/// Unit tests for IncidentModel serialization — in particular that `reportedAt`
+/// is written as a Firestore Timestamp and read back losslessly (Area 3), while
+/// still tolerating legacy ISO-8601 string values.
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  final reportedAt = DateTime(2026, 1, 15, 9, 30);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  IncidentModel buildModel() => IncidentModel(
+    id: 'inc_test',
+    userId: 'user_001',
+    cropName: 'Beans',
+    issueType: 'Fungal Blight',
+    severity: 'High',
+    location: 'Musanze District',
+    description: 'Yellowing leaves',
+    status: 'Reported',
+    reportedAt: reportedAt,
+  );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('toMap stores reportedAt as a Firestore Timestamp', () {
+    final map = buildModel().toMap();
+    expect(map['reportedAt'], isA<Timestamp>());
+    expect((map['reportedAt'] as Timestamp).toDate(), reportedAt);
+    expect(map['userId'], 'user_001');
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  test('fromMap reads a Timestamp back into a DateTime', () {
+    final map = buildModel().toMap();
+    final restored = IncidentModel.fromMap(map, 'inc_test');
+    expect(restored.reportedAt, reportedAt);
+    expect(restored.cropName, 'Beans');
+    expect(restored.severity, 'High');
+  });
+
+  test('fromMap still tolerates a legacy ISO-8601 string reportedAt', () {
+    final legacy = {
+      'userId': 'user_001',
+      'cropName': 'Maize',
+      'issueType': 'Pest Attack',
+      'severity': 'Critical',
+      'location': 'Nyabihu',
+      'description': 'Armyworm',
+      'status': 'Reported',
+      'reportedAt': reportedAt.toIso8601String(),
+    };
+    final restored = IncidentModel.fromMap(legacy, 'inc_legacy');
+    expect(restored.reportedAt, reportedAt);
   });
 }
