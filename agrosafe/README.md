@@ -137,12 +137,3 @@ flutter run
 
 ---
 
-## 👥 Group Member Contributions
-
-| Member | Track | Key Responsibilities |
-|---|---|---|
-| **Placide Igabe** | Frontend Lead | Figma to Flutter UI implementation, Stateless widget design, Navigation wiring |
-| **Sonia Bayingana** | Accessibility & UI | English/Kinyarwanda localization (`i18n_strings.dart`), High-contrast mode |
-| **Selena Isimbi** | Backend & Data | Weather advisory cubit, ERD design, Firestore repository layer |
-| **Placide Niyonizeye**| Backend & Auth | BLoC Clean Architecture setup, Firebase Auth implementation, Security rules |
-| **Ketia Gakwaya** | Testing & Docs | Unit/Widget test suite implementation, Final Report & Contribution tracking |
