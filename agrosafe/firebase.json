@@ -1,0 +1,29 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "agrosafe-47bb2",
+          "appId": "1:445232998608:android:cb456f49a615e3a20a16d5",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "agrosafe-47bb2",
+          "configurations": {
+            "android": "1:445232998608:android:cb456f49a615e3a20a16d5",
+            "ios": "1:445232998608:ios:7e195d31502105fe0a16d5",
+            "macos": "1:445232998608:ios:7e195d31502105fe0a16d5",
+            "web": "1:445232998608:web:b6fa3ba38c0324750a16d5",
+            "windows": "1:445232998608:web:8b7558cafe3728420a16d5"
+          }
+        }
+      }
+    }
+  }
+}
